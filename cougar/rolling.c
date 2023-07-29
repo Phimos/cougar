@@ -9,6 +9,7 @@
 #include "rolling_max.h"
 #include "rolling_mean.h"
 #include "rolling_median.h"
+#include "rolling_rank.h"
 #include "rolling_sum.h"
 
 /* Module method table */
@@ -17,6 +18,7 @@ static PyMethodDef rolling_methods[] = {
     {"rolling_mean", (PyCFunction)rolling_mean, METH_VARARGS | METH_KEYWORDS, "Rolling mean"},
     {"rolling_max", (PyCFunction)rolling_max, METH_VARARGS | METH_KEYWORDS, "Rolling max"},
     {"rolling_median", (PyCFunction)rolling_median, METH_VARARGS | METH_KEYWORDS, "Rolling median"},
+    {"rolling_rank", (PyCFunction)rolling_rank, METH_VARARGS | METH_KEYWORDS, "Rolling rank"},
     {NULL, NULL, 0, NULL}};
 
 /* Module structure */

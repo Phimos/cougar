@@ -7,6 +7,8 @@ setup(
     author="Yunchong Gan",
     author_email="yunchong@pku.edu.cn",
     packages=find_packages(),
+    requires=["numpy"],
+    install_requires=["numpy"],
     ext_modules=[
         Extension(
             "cougar.rolling",
