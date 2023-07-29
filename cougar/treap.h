@@ -1,6 +1,8 @@
 #ifndef __TREAP_H__
 #define __TREAP_H__
 
+#include "assert.h"
+#include "math.h"
 #include "stdio.h"
 #include "stdlib.h"
 
@@ -180,6 +182,38 @@ static inline double treap_query_rank(struct treap_* treap) {
                 rank += current->children_[0]->size_;
             return rank;
         }
+    }
+}
+
+static inline double treap_query_kth(struct treap_* treap, size_t k) {
+    debug("[treap] query kth %zu\n", k);
+    assert((k > 0) && (k <= treap->size_));
+    struct treap_node_* current = treap->root_;
+    size_t left_subtree_size = 0;
+    while (1) {
+        left_subtree_size = (current->children_[0]) ? current->children_[0]->size_ : 0;
+        if (k <= left_subtree_size) {
+            current = current->children_[0];
+        } else if (k > left_subtree_size + current->count_) {
+            k -= left_subtree_size + current->count_;
+            current = current->children_[1];
+        } else {
+            return current->value_;
+        }
+    }
+}
+
+static inline double treap_query_quantile(struct treap_* treap, double quantile) {
+    debug("[treap] query quantile %lf\n", quantile);
+    assert((quantile >= 0) && (quantile <= 1));
+    double rank = quantile * (treap->size_ - 1) + 1;
+    size_t lower = floor(rank);
+    size_t upper = ceil(rank);
+
+    if (lower == upper) {
+        return treap_query_kth(treap, lower);
+    } else {
+        return (treap_query_kth(treap, lower) * (upper - rank) + treap_query_kth(treap, upper) * (rank - lower));
     }
 }
 
