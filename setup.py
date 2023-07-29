@@ -9,6 +9,14 @@ setup(
     packages=find_packages(),
     requires=["numpy"],
     install_requires=["numpy"],
+    classifiers=[
+        "Intended Audience :: Science/Research",
+        "Natural Language :: English",
+        "Operating System :: MacOS :: MacOS X",
+        "Programming Language :: C",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.11",
+    ],
     ext_modules=[
         Extension(
             "cougar.rolling",
