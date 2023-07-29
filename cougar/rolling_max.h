@@ -1,3 +1,6 @@
+#ifndef __ROLLING_MAX_H__
+#define __ROLLING_MAX_H__
+
 #include "Python.h"
 #include "numpy/arrayobject.h"
 #include "numpy/npy_math.h"
@@ -293,3 +296,5 @@ PyObject* rolling_max(PyObject* self, PyObject* args, PyObject* kwargs) {
     Py_DECREF(arr);
     return output;
 }
+
+#endif

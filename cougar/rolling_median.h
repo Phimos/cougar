@@ -1,3 +1,6 @@
+#ifndef __ROLLING_MEDIAN_H__
+#define __ROLLING_MEDIAN_H__
+
 #include "Python.h"
 #include "numpy/arrayobject.h"
 #include "numpy/npy_math.h"
@@ -362,3 +365,5 @@ static PyObject* rolling_median(PyObject* self, PyObject* args, PyObject* kwargs
     Py_DECREF(arr);
     return output;
 }
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef __ROLLING_MEAN_H__
+#define __ROLLING_MEAN_H__
+
 #include "Python.h"
 #include "numpy/arrayobject.h"
 #include "numpy/npy_math.h"
@@ -370,3 +373,5 @@ static PyObject* rolling_mean(PyObject* self, PyObject* args, PyObject* kwargs) 
     Py_DECREF(arr);
     return output;
 }
+
+#endif

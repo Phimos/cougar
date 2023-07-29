@@ -1,3 +1,6 @@
+#ifndef __ROLLING_SUM_H__
+#define __ROLLING_SUM_H__
+
 #include "Python.h"
 #include "numpy/arrayobject.h"
 #include "numpy/npy_math.h"
@@ -360,3 +363,5 @@ static PyObject* rolling_sum(PyObject* self, PyObject* args, PyObject* kwargs) {
     Py_DECREF(arr);
     return output;
 }
+
+#endif
