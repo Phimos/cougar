@@ -6,13 +6,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-#define DEBUG 0
-
-#if DEBUG
-#define debug(fmt, ...) fprintf(stderr, fmt, __VA_ARGS__)
-#else
-#define debug(fmt, ...)
-#endif
+#include "debug.h"
 
 struct treap_node_ {
     double value_;                     // value of the node
@@ -284,6 +278,7 @@ static inline void treap_remove(struct treap_* treap) {
     } else {
         treap->root_ = treap_node_remove(node);
     }
+    debug("[treap] remove done\n");
 }
 
 #endif
