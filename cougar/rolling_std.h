@@ -115,6 +115,8 @@ static PyObject* rolling_std(PyObject* self, PyObject* args, PyObject* kwargs) {
     min_count = min_count < 0 ? window : min_count;
     axis = axis < 0 ? ndim + axis : axis;
 
+    // TODO: set warning / error if min_count / window < 2
+
     if (dtype == NPY_FLOAT32)
         output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT32, 0);
     else
