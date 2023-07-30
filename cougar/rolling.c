@@ -6,6 +6,8 @@
 
 #include "stdio.h"
 
+#include "rolling_argmax.h"
+#include "rolling_argmin.h"
 #include "rolling_max.h"
 #include "rolling_mean.h"
 #include "rolling_median.h"
@@ -24,6 +26,8 @@ static PyMethodDef rolling_methods[] = {
     {"rolling_var", (PyCFunction)rolling_var, METH_VARARGS | METH_KEYWORDS, "Rolling var"},
     {"rolling_max", (PyCFunction)rolling_max, METH_VARARGS | METH_KEYWORDS, "Rolling max"},
     {"rolling_min", (PyCFunction)rolling_min, METH_VARARGS | METH_KEYWORDS, "Rolling min"},
+    {"rolling_argmin", (PyCFunction)rolling_argmin, METH_VARARGS | METH_KEYWORDS, "Rolling argmin"},
+    {"rolling_argmax", (PyCFunction)rolling_argmax, METH_VARARGS | METH_KEYWORDS, "Rolling argmax"},
     {"rolling_median", (PyCFunction)rolling_median, METH_VARARGS | METH_KEYWORDS, "Rolling median"},
     {"rolling_rank", (PyCFunction)rolling_rank, METH_VARARGS | METH_KEYWORDS, "Rolling rank"},
     {"rolling_quantile", (PyCFunction)rolling_quantile, METH_VARARGS | METH_KEYWORDS, "Rolling quantile"},
