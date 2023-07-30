@@ -6,5 +6,7 @@ from .rolling import (
     rolling_median,
     rolling_quantile,
     rolling_rank,
+    rolling_std,
     rolling_sum,
+    rolling_var,
 )
