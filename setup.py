@@ -3,13 +3,14 @@ from setuptools import Extension, find_packages, setup
 
 setup(
     name="cougar",
-    version="0.1.0",
+    version="0.2.0",
     author="Yunchong Gan",
     author_email="yunchong@pku.edu.cn",
     packages=find_packages(),
     requires=["numpy"],
     install_requires=["numpy"],
     classifiers=[
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Science/Research",
         "Natural Language :: English",
         "Operating System :: MacOS :: MacOS X",
