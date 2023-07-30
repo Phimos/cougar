@@ -125,4 +125,8 @@ static PyObject* rolling_sum(PyObject* self, PyObject* args, PyObject* kwargs) {
     return output;
 }
 
+PyDoc_STRVAR(
+    rolling_sum_doc,
+    "rolling_sum(arr, window, min_count=-1, axis=-1)\n");
+
 #endif

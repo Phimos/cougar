@@ -18,7 +18,7 @@
 
 /* Module method table */
 static PyMethodDef rolling_methods[] = {
-    {"rolling_sum", (PyCFunction)rolling_sum, METH_VARARGS | METH_KEYWORDS, "Rolling sum"},
+    {"rolling_sum", (PyCFunction)rolling_sum, METH_VARARGS | METH_KEYWORDS, rolling_sum_doc},
     {"rolling_mean", (PyCFunction)rolling_mean, METH_VARARGS | METH_KEYWORDS, "Rolling mean"},
     {"rolling_std", (PyCFunction)rolling_std, METH_VARARGS | METH_KEYWORDS, "Rolling std"},
     {"rolling_var", (PyCFunction)rolling_var, METH_VARARGS | METH_KEYWORDS, "Rolling var"},
