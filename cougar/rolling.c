@@ -8,12 +8,14 @@
 
 #include "rolling_argmax.h"
 #include "rolling_argmin.h"
+#include "rolling_kurt.h"
 #include "rolling_max.h"
 #include "rolling_mean.h"
 #include "rolling_median.h"
 #include "rolling_min.h"
 #include "rolling_quantile.h"
 #include "rolling_rank.h"
+#include "rolling_skew.h"
 #include "rolling_std.h"
 #include "rolling_sum.h"
 #include "rolling_var.h"
@@ -24,6 +26,8 @@ static PyMethodDef rolling_methods[] = {
     {"rolling_mean", (PyCFunction)rolling_mean, METH_VARARGS | METH_KEYWORDS, "Rolling mean"},
     {"rolling_std", (PyCFunction)rolling_std, METH_VARARGS | METH_KEYWORDS, "Rolling std"},
     {"rolling_var", (PyCFunction)rolling_var, METH_VARARGS | METH_KEYWORDS, "Rolling var"},
+    {"rolling_skew", (PyCFunction)rolling_skew, METH_VARARGS | METH_KEYWORDS, "Rolling skew"},
+    {"rolling_kurt", (PyCFunction)rolling_kurt, METH_VARARGS | METH_KEYWORDS, "Rolling kurt"},
     {"rolling_max", (PyCFunction)rolling_max, METH_VARARGS | METH_KEYWORDS, "Rolling max"},
     {"rolling_min", (PyCFunction)rolling_min, METH_VARARGS | METH_KEYWORDS, "Rolling min"},
     {"rolling_argmin", (PyCFunction)rolling_argmin, METH_VARARGS | METH_KEYWORDS, "Rolling argmin"},
