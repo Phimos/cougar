@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "cougar"
+version = "0.2.0"
+description = ""
+authors = ["Yunchong Gan <yunchong@pku.edu.cn>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^1.25.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
