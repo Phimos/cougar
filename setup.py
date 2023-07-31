@@ -1,9 +1,16 @@
+from pathlib import Path
+
 import numpy as np
 from setuptools import Extension, find_packages, setup
 
+project_dir = Path(__file__).parent.resolve()
+long_description = (project_dir / "README.md").read_text(encoding="utf-8")
+
 setup(
     name="cougar",
-    version="0.2.0",
+    version="{{VERSION_PLACEHOLDER}}",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Yunchong Gan",
     author_email="yunchong@pku.edu.cn",
     packages=find_packages(),
