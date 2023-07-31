@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, 3.10, 3.11]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@master
@@ -32,11 +32,15 @@ jobs:
         run: echo ::set-output name=TAG_NAME::$(echo $GITHUB_REF | cut -d / -f 3)
       - name: Update version in setup.py
         run: >-
-          sed -i "" "s|{{VERSION}}|${{ steps.tag.outputs.TAG_NAME }}|g" setup.py
+          if [[ ${{ matrix.os }} == 'windows-latest' ]]; then
+            sed -i "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
+          else
+            sed -i "" "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
+          fi
       - name: Build a binary wheel
         run: >-
           python setup.py sdist bdist_wheel
       - name: Publish distribution 📦 to PyPI
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
