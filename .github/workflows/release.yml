@@ -31,11 +31,11 @@ jobs:
         id: tag
         run: echo ::set-output name=TAG_NAME::$(echo $GITHUB_REF | cut -d / -f 3)
       - name: Update version in setup.py
-        run: >-
-          if [[ ${{ matrix.os }} == 'windows-latest' ]]; then
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
             sed -i "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
           else
-            sed -i "" "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
+            sed -i '' "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
           fi
       - name: Build a binary wheel
         run: >-
