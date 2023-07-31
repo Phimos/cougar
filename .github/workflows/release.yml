@@ -34,7 +34,9 @@ jobs:
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
             sed -i "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
-          else
+          elif [[ "$RUNNER_OS" == "Linux" ]]; then
+            sed -i "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
             sed -i '' "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
           fi
       - name: Build a binary wheel
