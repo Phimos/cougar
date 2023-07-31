@@ -8,7 +8,7 @@ long_description = (project_dir / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="cougar",
-    version="{{VERSION_PLACEHOLDER}}",
+    version="{{VERSION}}",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Yunchong Gan",
