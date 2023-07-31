@@ -30,15 +30,21 @@ jobs:
       - name: Extract tag name
         id: tag
         run: echo ::set-output name=TAG_NAME::$(echo $GITHUB_REF | cut -d / -f 3)
-      - name: Update version in setup.py
-        run: |
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            sed -i "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
-          elif [[ "$RUNNER_OS" == "Linux" ]]; then
-            sed -i "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            sed -i '' "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
-          fi
+      - name: Update version in setup.py on Linux
+        if: >-
+          runner.os == 'Linux'
+        run: >-
+          sed -i "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
+      - name: Update version in setup.py on macOS
+        if: >-
+          runner.os == 'macOS'
+        run: >-
+          sed -i '' "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
+      - name: Update version in setup.py on Windows
+        if: >-
+          runner.os == 'Windows'
+        run: >-
+          sed -i "s/{{VERSION}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
       - name: Build a binary wheel
         run: >-
           python setup.py sdist bdist_wheel
