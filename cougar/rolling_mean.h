@@ -7,37 +7,15 @@
 
 #include "stdio.h"
 
-#define Rolling_GetValue(name, dtype) (name = (*((npy_##dtype*)name##_ptr)))
-#define Rolling_SetValue(name, value, dtype) *((npy_##dtype*)name##_ptr) = (value)
+#include "template.h"
 
-#define RollingMean_Init(itype, otype)                                                                     \
-    Py_ssize_t n = PyArray_SHAPE(input)[axis];                                                             \
-    Py_ssize_t input_stride = PyArray_STRIDES(input)[axis];                                                \
-    Py_ssize_t output_stride = PyArray_STRIDES(output)[axis];                                              \
-                                                                                                           \
-    PyArrayIterObject* input_iter = (PyArrayIterObject*)PyArray_IterAllButAxis((PyObject*)input, &axis);   \
-    PyArrayIterObject* output_iter = (PyArrayIterObject*)PyArray_IterAllButAxis((PyObject*)output, &axis); \
-                                                                                                           \
-    char *output_ptr = NULL, *curr_ptr = NULL, *prev_ptr = NULL;                                           \
-    int count = 0, i = 0;                                                                                  \
-    npy_##itype curr, prev;                                                                                \
+#define RollingMean_Init(itype, otype) \
+    Rolling_Init(itype, otype);        \
     npy_##otype sum = 0;
 
-#define RollingMean_InitIter()                                  \
-    prev_ptr = curr_ptr = (char*)PyArray_ITER_DATA(input_iter); \
-    output_ptr = (char*)PyArray_ITER_DATA(output_iter);         \
-    count = 0;                                                  \
+#define RollingMean_InitIter() \
+    Rolling_InitIter();        \
     sum = 0;
-
-#define RollingMean_NextIter()     \
-    PyArray_ITER_NEXT(input_iter); \
-    PyArray_ITER_NEXT(output_iter);
-
-#define RollingMean_While while (input_iter->index < input_iter->size)
-
-#define RollingMean_ForMinCount for (i = 0; i < min_count - 1; ++i, curr_ptr += input_stride, output_ptr += output_stride)
-#define RollingMean_ForWindow for (; i < window; ++i, curr_ptr += input_stride, output_ptr += output_stride)
-#define RollingMean_ForN for (; i < n; ++i, curr_ptr += input_stride, prev_ptr += input_stride, output_ptr += output_stride)
 
 #define RollingMean_Compute_NoVerify() (sum / count)
 #define RollingMean_Compute() ((count >= min_count) ? RollingMean_Compute_NoVerify() : NPY_NAN)
@@ -103,22 +81,22 @@
         RollingMean_Init(itype, otype);                         \
                                                                 \
         Py_BEGIN_ALLOW_THREADS;                                 \
-        RollingMean_While {                                     \
+        Rolling_While {                                         \
             RollingMean_InitIter();                             \
                                                                 \
-            RollingMean_ForMinCount {                           \
+            Rolling_ForMinCount {                               \
                 RollingMean_StepMinCount(itype, otype);         \
             }                                                   \
                                                                 \
-            RollingMean_ForWindow {                             \
+            Rolling_ForWindow {                                 \
                 RollingMean_StepWindow(itype, otype);           \
             }                                                   \
                                                                 \
-            RollingMean_ForN {                                  \
+            Rolling_ForN {                                      \
                 RollingMean_StepN(itype, otype);                \
             }                                                   \
                                                                 \
-            RollingMean_NextIter();                             \
+            Rolling_NextIter();                                 \
         }                                                       \
                                                                 \
         Py_END_ALLOW_THREADS;                                   \
@@ -132,22 +110,22 @@
         RollingMean_Init(itype, otype);                                     \
                                                                             \
         Py_BEGIN_ALLOW_THREADS;                                             \
-        RollingMean_While {                                                 \
+        Rolling_While {                                                     \
             RollingMean_InitIter();                                         \
                                                                             \
-            RollingMean_ForMinCount {                                       \
+            Rolling_ForMinCount {                                           \
                 RollingMean_StepMinCount_NoVerify(itype, otype);            \
             }                                                               \
                                                                             \
-            RollingMean_ForWindow {                                         \
+            Rolling_ForWindow {                                             \
                 RollingMean_StepWindow_NoVerify(itype, otype);              \
             }                                                               \
                                                                             \
-            RollingMean_ForN {                                              \
+            Rolling_ForN {                                                  \
                 RollingMean_StepN_NoVerify(itype, otype);                   \
             }                                                               \
                                                                             \
-            RollingMean_NextIter();                                         \
+            Rolling_NextIter();                                             \
         }                                                                   \
                                                                             \
         Py_END_ALLOW_THREADS;                                               \
