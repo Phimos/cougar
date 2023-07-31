@@ -18,7 +18,7 @@ static void rolling_min_float64(PyArrayObject* input, PyArrayObject* output, int
     PyArrayIterObject* output_iter = (PyArrayIterObject*)PyArray_IterAllButAxis((PyObject*)output, &axis);
 
     char *output_ptr = NULL, *curr_ptr = NULL, *prev_ptr = NULL;
-    int count = 0, i = 0;
+    size_t count = 0, i = 0;
     npy_float64 curr, prev;
 
     struct monotonic_queue_* queue = monotonic_queue_init(window, 1);
@@ -58,7 +58,7 @@ static void rolling_min_float64(PyArrayObject* input, PyArrayObject* output, int
 
             if (npy_isfinite(prev)) {
                 --count;
-                if (monotonic_queue_front_index(queue) <= i - window) {
+                if (monotonic_queue_front_index(queue) + window <= i) {
                     monotonic_queue_pop_front(queue);
                 }
             }
