@@ -1,4 +1,4 @@
-__version__ = "0.2.0"
+__version__ = "{{VERSION}}"
 
 from .rolling import (  # rolling_kurt,; rolling_skew,; rolling_std,; rolling_var,
     rolling_argmax,
