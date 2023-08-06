@@ -105,6 +105,7 @@ static inline void method(push, T)(monotonic_queue(T) * queue, T value, size_t i
 }
 
 #undef method
+#undef monotonic_queue
 #undef concat
 
 #endif

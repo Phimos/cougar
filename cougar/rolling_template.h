@@ -35,4 +35,4 @@
 #define Rolling_ForN \
     for (; i < n; ++i, curr_ptr += source_stride, prev_ptr += source_stride, target_ptr += target_stride)
 
-#endif
+#endif  // __ROLLING_TEMPLATE_H__

@@ -11,24 +11,24 @@
 #ifndef Rolling_Valid
 #define __ROLLING_VALID
 #define Rolling_Valid(value) (npy_isfinite(value))
-#endif
+#endif  // Rolling_Valid
 
 #ifndef Rolling_Signature
 #define __ROLLING_SIGNATURE
 #define Rolling_Signature(name, stype, ttype)                                          \
     static void rolling_##name##_##stype(PyArrayObject* source, PyArrayObject* target, \
                                          int window, int min_count, int axis)
-#endif
+#endif  // Rolling_Signature
 
 #ifndef Rolling_Init
 #define __ROLLING_INIT
 #define Rolling_Init(stype, ttype) ;
-#endif
+#endif  // Rolling_Init
 
 #ifndef Rolling_Reset
 #define __ROLLING_RESET
 #define Rolling_Reset() ;
-#endif
+#endif  // Rolling_Reset
 
 #ifdef Rolling_Insert
 #ifdef Rolling_Evict
