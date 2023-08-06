@@ -4,13 +4,19 @@
 
 #include "rolling_template.h"
 
+// #define __ROLLING_NO_VERIFY
+
 #ifdef SourceType
 #ifdef TargetType
 #ifdef Method
 
 #ifndef Rolling_Valid
 #define __ROLLING_VALID
+#ifdef __ROLLING_NO_VERIFY
+#define Rolling_Valid(value) (1)
+#else  // __ROLLING_NO_VERIFY
 #define Rolling_Valid(value) (npy_isfinite(value))
+#endif  // __ROLLING_NO_VERIFY
 #endif  // Rolling_Valid
 
 #ifndef Rolling_Signature
@@ -36,48 +42,26 @@
 
 #ifndef Rolling_StepMinCount
 #define __ROLLING_STEP_MIN_COUNT
-#ifdef __ROLLING_NO_VERIFY
-#define Rolling_StepMinCount(stype, ttype) \
-    Rolling_GetValue(curr, stype);         \
-    Rolling_Insert(curr);                  \
-    Rolling_SetValue(target, NPY_NAN, ttype);
-#else  // __ROLLING_NO_VERIFY
 #define Rolling_StepMinCount(stype, ttype) \
     Rolling_GetValue(curr, stype);         \
     if (Rolling_Valid(curr)) {             \
         Rolling_Insert(curr);              \
     }                                      \
     Rolling_SetValue(target, NPY_NAN, ttype);
-#endif  // __ROLLING_NO_VERIFY
 #endif  // Rolling_StepMinCount
 
 #ifndef Rolling_StepWindow
 #define __ROLLING_STEP_WINDOW
-#ifdef __ROLLING_NO_VERIFY
-#define Rolling_StepWindow(stype, ttype) \
-    Rolling_GetValue(curr, stype);       \
-    Rolling_Insert(curr);                \
-    Rolling_SetValue(target, Rolling_Compute(), ttype);
-#else  // __ROLLING_NO_VERIFY
 #define Rolling_StepWindow(stype, ttype) \
     Rolling_GetValue(curr, stype);       \
     if (Rolling_Valid(curr)) {           \
         Rolling_Insert(curr);            \
     }                                    \
     Rolling_SetValue(target, Rolling_Compute(), ttype);
-#endif  // __ROLLING_NO_VERIFY
 #endif  // Rolling_StepWindow
 
 #ifndef Rolling_StepN
 #define __ROLLING_STEP_N
-#ifdef __ROLLING_NO_VERIFY
-#define Rolling_StepN(stype, ttype) \
-    Rolling_GetValue(curr, stype);  \
-    Rolling_GetValue(prev, stype);  \
-    Rolling_Insert(curr);           \
-    Rolling_Evict(prev);            \
-    Rolling_SetValue(target, Rolling_Compute(), ttype)
-#else  // __ROLLING_NO_VERIFY
 #define Rolling_StepN(stype, ttype) \
     Rolling_GetValue(curr, stype);  \
     Rolling_GetValue(prev, stype);  \
@@ -88,7 +72,6 @@
         Rolling_Evict(prev);        \
     }                               \
     Rolling_SetValue(target, Rolling_Compute(), ttype)
-#endif  // __ROLLING_NO_VERIFY
 #endif  // Rolling_StepN
 
 #endif  // Rolling_Compute
