@@ -102,33 +102,34 @@
         Py_END_ALLOW_THREADS;                                  \
     }
 
-#define RollingSum_Impl_NoVerify(itype, otype)                             \
-    static void rolling_sum_##itype##_no_verify(PyArrayObject* input,      \
-                                                PyArrayObject* output,     \
-                                                int window, int min_count, \
-                                                int axis) {                \
-        RollingSum_Init(itype, otype);                                     \
-                                                                           \
-        Py_BEGIN_ALLOW_THREADS;                                            \
-        Rolling_While {                                                    \
-            RollingSum_InitIter();                                         \
-                                                                           \
-            Rolling_ForMinCount {                                          \
-                RollingSum_StepMinCount_NoVerify(itype, otype);            \
-            }                                                              \
-                                                                           \
-            Rolling_ForWindow {                                            \
-                RollingSum_StepWindow_NoVerify(itype, otype);              \
-            }                                                              \
-                                                                           \
-            Rolling_ForN {                                                 \
-                RollingSum_StepN_NoVerify(itype, otype);                   \
-            }                                                              \
-                                                                           \
-            Rolling_NextIter();                                            \
-        }                                                                  \
-                                                                           \
-        Py_END_ALLOW_THREADS;                                              \
+#define RollingSum_Impl_NoVerify(itype, otype)                         \
+    static void rolling_sum_##itype##_no_verify(PyArrayObject* input,  \
+                                                PyArrayObject* output, \
+                                                size_t window,         \
+                                                size_t min_count,      \
+                                                int axis) {            \
+        RollingSum_Init(itype, otype);                                 \
+                                                                       \
+        Py_BEGIN_ALLOW_THREADS;                                        \
+        Rolling_While {                                                \
+            RollingSum_InitIter();                                     \
+                                                                       \
+            Rolling_ForMinCount {                                      \
+                RollingSum_StepMinCount_NoVerify(itype, otype);        \
+            }                                                          \
+                                                                       \
+            Rolling_ForWindow {                                        \
+                RollingSum_StepWindow_NoVerify(itype, otype);          \
+            }                                                          \
+                                                                       \
+            Rolling_ForN {                                             \
+                RollingSum_StepN_NoVerify(itype, otype);               \
+            }                                                          \
+                                                                       \
+            Rolling_NextIter();                                        \
+        }                                                              \
+                                                                       \
+        Py_END_ALLOW_THREADS;                                          \
     }
 
 RollingSum_Impl(float64, float64);
