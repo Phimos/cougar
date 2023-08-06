@@ -42,9 +42,6 @@ jobs:
           runner.os == 'Windows'
         run: >-
           sed -i "s/\{\{VERSION\}\}/${{ github.ref_name }}/g" setup.py
-      - name: Show current `setup.py` file
-        run: >-
-          cat setup.py
       - name: Build a binary wheel on Linux
         if : >-
           runner.os == 'Linux'
