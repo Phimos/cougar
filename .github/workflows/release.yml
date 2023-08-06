@@ -52,7 +52,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: python-package-distributions
-          path: dist/*.whl
+          path: dist/
 
   publish:
     runs-on: ubuntu-latest
@@ -61,7 +61,7 @@ jobs:
     - name: Download the binary wheel
       uses: actions/download-artifact@v2
       with:
-        name: wheel
+        name: python-package-distributions
         path: dist/
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
