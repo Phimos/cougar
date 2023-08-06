@@ -16,7 +16,7 @@ def sliding_window(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
 
 def rolling_sum(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
     return pad(
-        sliding_window(arr, window, axis=axis).sum(axis=-1),
+        sliding_window(arr, window, axis=axis).sum(axis=-1).astype(np.float64),
         window - 1,
         axis,
     )

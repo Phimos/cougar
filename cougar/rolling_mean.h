@@ -36,7 +36,7 @@
 #undef TargetType
 
 #define SourceType npy_float32
-#define TargetType npy_float32
+#define TargetType npy_float64
 
 #include "rolling_impl.h"
 
@@ -93,10 +93,10 @@ static PyObject* rolling_mean(PyObject* self, PyObject* args, PyObject* kwargs) 
     min_count = min_count < 0 ? window : min_count;
     axis = axis < 0 ? ndim + axis : axis;
 
-    if (dtype == NPY_FLOAT32)
-        output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT32, 0);
-    else
-        output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT64, 0);
+    // if (dtype == NPY_FLOAT32)
+    //     output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT32, 0);
+    // else
+    output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT64, 0);
     mean = (PyArrayObject*)output;
 
     if (dtype == NPY_FLOAT64) {
