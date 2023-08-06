@@ -23,14 +23,14 @@
 #ifdef T
 #undef T
 #endif
-#define T long long
+#define T int64_t
 #include "monotonic_queue_impl.h"
 #undef T
 
 #ifdef T
 #undef T
 #endif
-#define T int
+#define T int32_t
 #include "monotonic_queue_impl.h"
 #undef T
 
