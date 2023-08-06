@@ -53,7 +53,7 @@ jobs:
         run: >-
           python setup.py sdist bdist_wheel
       - name: Store the binary wheel
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: python-package-distributions
           path: dist/
@@ -63,7 +63,7 @@ jobs:
     needs: build-and-store
     steps:
     - name: Download the binary wheel
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: python-package-distributions
         path: dist/
