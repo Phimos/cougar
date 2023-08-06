@@ -9,9 +9,9 @@
 
 #define Method mean
 
-#define Rolling_Init(stype, ttype) \
-    size_t count = 0;              \
-    ttype sum = 0;
+#define Rolling_Init() \
+    size_t count = 0;  \
+    TargetType sum = 0;
 
 #define Rolling_Insert(value) \
     sum += value;             \
@@ -93,9 +93,6 @@ static PyObject* rolling_mean(PyObject* self, PyObject* args, PyObject* kwargs) 
     min_count = min_count < 0 ? window : min_count;
     axis = axis < 0 ? ndim + axis : axis;
 
-    // if (dtype == NPY_FLOAT32)
-    //     output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT32, 0);
-    // else
     output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT64, 0);
     mean = (PyArrayObject*)output;
 

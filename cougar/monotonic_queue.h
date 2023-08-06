@@ -9,39 +9,53 @@
 #ifdef T
 #undef T
 #endif
+
 #define T double
 #include "monotonic_queue_impl.h"
 #undef T
 
-#ifdef T
-#undef T
-#endif
 #define T float
 #include "monotonic_queue_impl.h"
 #undef T
 
-#ifdef T
-#undef T
-#endif
 #define T int64_t
 #include "monotonic_queue_impl.h"
 #undef T
 
-#ifdef T
-#undef T
-#endif
 #define T int32_t
 #include "monotonic_queue_impl.h"
 #undef T
 
-#ifdef T
-#undef T
-#endif
 #define T char
 #include "monotonic_queue_impl.h"
 #undef T
 
+#define T npy_float64
+#include "monotonic_queue_impl.h"
+#undef T
+
+#define T npy_float32
+#include "monotonic_queue_impl.h"
+#undef T
+
+#define T npy_int64
+#include "monotonic_queue_impl.h"
+#undef T
+
+#define T npy_int32
+#include "monotonic_queue_impl.h"
+#undef T
+
+#define T npy_bool
+#include "monotonic_queue_impl.h"
+#undef T
+
 #define monotonic_queue_ monotonic_queue_double
+
+#define monotonic_queue_concat(a, b) a##_##b
+#define monotonic_queue(dtype) struct monotonic_queue_concat(monotonic_queue, dtype)
+#define monotonic_queue_method(name, dtype) \
+    monotonic_queue_concat(monotonic_queue_##name, dtype)
 
 // struct monotonic_queue_ {
 //     size_t size_, capacity_;

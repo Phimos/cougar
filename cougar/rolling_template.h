@@ -1,10 +1,12 @@
 #ifndef __ROLLING_TEMPLATE_H__
 #define __ROLLING_TEMPLATE_H__
 
+#define Rolling_Concat(a, b) a##_##b
+
 #define Rolling_GetValue(name, dtype) (name = (*((dtype*)name##_ptr)))
 #define Rolling_SetValue(name, value, dtype) *((dtype*)name##_ptr) = (value)
 
-#define Rolling_Prepare(stype, ttype)                                         \
+#define Rolling_Prepare()                                                     \
     Py_ssize_t n = PyArray_SHAPE(source)[axis];                               \
     Py_ssize_t source_stride = PyArray_STRIDES(source)[axis];                 \
     Py_ssize_t target_stride = PyArray_STRIDES(target)[axis];                 \
@@ -16,7 +18,7 @@
                                                                               \
     char *target_ptr = NULL, *curr_ptr = NULL, *prev_ptr = NULL;              \
     size_t i = 0;                                                             \
-    stype curr, prev;
+    SourceType curr, prev;
 
 #define Rolling_While while (source_iter->index < source_iter->size)
 

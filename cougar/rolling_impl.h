@@ -21,14 +21,15 @@
 
 #ifndef Rolling_Signature
 #define __ROLLING_SIGNATURE
-#define Rolling_Signature(name, stype, ttype)                                          \
-    static void rolling_##name##_##stype(PyArrayObject* source, PyArrayObject* target, \
-                                         int window, int min_count, int axis)
+#define Rolling_Signature(name, dtype)                                        \
+    static void Rolling_Concat(rolling_##name, dtype)(PyArrayObject * source, \
+                                                      PyArrayObject * target, \
+                                                      int window, int min_count, int axis)
 #endif  // Rolling_Signature
 
 #ifndef Rolling_Init
 #define __ROLLING_INIT
-#define Rolling_Init(stype, ttype) ;
+#define Rolling_Init() ;
 #endif  // Rolling_Init
 
 #ifndef Rolling_Reset
@@ -36,72 +37,78 @@
 #define Rolling_Reset() ;
 #endif  // Rolling_Reset
 
+#ifndef Rolling_Finalize
+#define __ROLLING_FINALIZE
+#define Rolling_Finalize() ;
+#endif  // Rolling_Finalize
+
 #ifdef Rolling_Insert
 #ifdef Rolling_Evict
 #ifdef Rolling_Compute
 
 #ifndef Rolling_StepMinCount
 #define __ROLLING_STEP_MIN_COUNT
-#define Rolling_StepMinCount(stype, ttype) \
-    Rolling_GetValue(curr, stype);         \
-    if (Rolling_Valid(curr)) {             \
-        Rolling_Insert(curr);              \
-    }                                      \
-    Rolling_SetValue(target, NPY_NAN, ttype);
+#define Rolling_StepMinCount()          \
+    Rolling_GetValue(curr, SourceType); \
+    if (Rolling_Valid(curr)) {          \
+        Rolling_Insert(curr);           \
+    }                                   \
+    Rolling_SetValue(target, NPY_NAN, TargetType);
 #endif  // Rolling_StepMinCount
 
 #ifndef Rolling_StepWindow
 #define __ROLLING_STEP_WINDOW
-#define Rolling_StepWindow(stype, ttype) \
-    Rolling_GetValue(curr, stype);       \
-    if (Rolling_Valid(curr)) {           \
-        Rolling_Insert(curr);            \
-    }                                    \
-    Rolling_SetValue(target, Rolling_Compute(), ttype);
+#define Rolling_StepWindow()            \
+    Rolling_GetValue(curr, SourceType); \
+    if (Rolling_Valid(curr)) {          \
+        Rolling_Insert(curr);           \
+    }                                   \
+    Rolling_SetValue(target, Rolling_Compute(), TargetType);
 #endif  // Rolling_StepWindow
 
 #ifndef Rolling_StepN
 #define __ROLLING_STEP_N
-#define Rolling_StepN(stype, ttype) \
-    Rolling_GetValue(curr, stype);  \
-    Rolling_GetValue(prev, stype);  \
-    if (Rolling_Valid(curr)) {      \
-        Rolling_Insert(curr);       \
-    }                               \
-    if (Rolling_Valid(prev)) {      \
-        Rolling_Evict(prev);        \
-    }                               \
-    Rolling_SetValue(target, Rolling_Compute(), ttype)
+#define Rolling_StepN()                 \
+    Rolling_GetValue(curr, SourceType); \
+    Rolling_GetValue(prev, SourceType); \
+    if (Rolling_Valid(curr)) {          \
+        Rolling_Insert(curr);           \
+    }                                   \
+    if (Rolling_Valid(prev)) {          \
+        Rolling_Evict(prev);            \
+    }                                   \
+    Rolling_SetValue(target, Rolling_Compute(), TargetType)
 #endif  // Rolling_StepN
 
 #endif  // Rolling_Compute
 #endif  // Rolling_Evict
 #endif  // Rolling_Insert
 
-#define Rolling_Main(name, stype, ttype)            \
-    Rolling_Signature(name, stype, ttype) {         \
-        Rolling_Prepare(stype, ttype);              \
-        Rolling_Init(stype, ttype);                 \
-                                                    \
-        Py_BEGIN_ALLOW_THREADS;                     \
-        Rolling_While {                             \
-            Rolling_InitIter();                     \
-            Rolling_Reset();                        \
-            Rolling_ForMinCount {                   \
-                Rolling_StepMinCount(stype, ttype); \
-            }                                       \
-            Rolling_ForWindow {                     \
-                Rolling_StepWindow(stype, ttype);   \
-            }                                       \
-            Rolling_ForN {                          \
-                Rolling_StepN(stype, ttype);        \
-            }                                       \
-            Rolling_NextIter();                     \
-        }                                           \
-        Py_END_ALLOW_THREADS;                       \
+#define Rolling_Main(name)                \
+    Rolling_Signature(name, SourceType) { \
+        Rolling_Prepare();                \
+        Rolling_Init();                   \
+                                          \
+        Py_BEGIN_ALLOW_THREADS;           \
+        Rolling_While {                   \
+            Rolling_InitIter();           \
+            Rolling_Reset();              \
+            Rolling_ForMinCount {         \
+                Rolling_StepMinCount();   \
+            }                             \
+            Rolling_ForWindow {           \
+                Rolling_StepWindow();     \
+            }                             \
+            Rolling_ForN {                \
+                Rolling_StepN();          \
+            }                             \
+            Rolling_NextIter();           \
+        }                                 \
+        Py_END_ALLOW_THREADS;             \
+        Rolling_Finalize();               \
     }
 
-Rolling_Main(Method, SourceType, TargetType)
+Rolling_Main(Method)
 
 #ifdef __ROLLING_VALID
 #undef Rolling_Valid
@@ -137,6 +144,11 @@ Rolling_Main(Method, SourceType, TargetType)
 #undef Rolling_Reset
 #undef __ROLLING_RESET
 #endif  // __ROLLING_RESET
+
+#ifdef __ROLLING_FINALIZE
+#undef Rolling_Finalize
+#undef __ROLLING_FINALIZE
+#endif  // __ROLLING_FINALIZE
 
 #endif  // Method
 #endif  // TargetType

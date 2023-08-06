@@ -9,74 +9,64 @@
 
 #include "monotonic_queue.h"
 
-static void rolling_min_float64(PyArrayObject* input, PyArrayObject* output, int window, int min_count, int axis) {
-    Py_ssize_t n = PyArray_SHAPE(input)[axis];
-    Py_ssize_t input_stride = PyArray_STRIDES(input)[axis];
-    Py_ssize_t output_stride = PyArray_STRIDES(output)[axis];
+#define Method min
 
-    PyArrayIterObject* input_iter = (PyArrayIterObject*)PyArray_IterAllButAxis((PyObject*)input, &axis);
-    PyArrayIterObject* output_iter = (PyArrayIterObject*)PyArray_IterAllButAxis((PyObject*)output, &axis);
+#define Rolling_Init()                   \
+    size_t count = 0;                    \
+    monotonic_queue(SourceType)* queue = \
+        monotonic_queue_method(init, SourceType)(window, 1);
 
-    char *output_ptr = NULL, *curr_ptr = NULL, *prev_ptr = NULL;
-    size_t count = 0, i = 0;
-    npy_float64 curr, prev;
+#define Rolling_Reset() \
+    count = 0;          \
+    monotonic_queue_method(reset, SourceType)(queue);
 
-    struct monotonic_queue_* queue = monotonic_queue_init(window, 1);
+#define Rolling_Insert(value) \
+    ++count;                  \
+    monotonic_queue_method(push, SourceType)(queue, value, i);
 
-    Py_BEGIN_ALLOW_THREADS;
-    while (input_iter->index < input_iter->size) {
-        prev_ptr = curr_ptr = (char*)PyArray_ITER_DATA(input_iter);
-        output_ptr = (char*)PyArray_ITER_DATA(output_iter);
-        count = 0;
-        monotonic_queue_reset(queue);
-
-        for (i = 0; i < min_count - 1; ++i, curr_ptr += input_stride, output_ptr += output_stride) {
-            curr = *((npy_float64*)curr_ptr);
-
-            if (npy_isfinite(curr)) {
-                ++count;
-                monotonic_queue_push(queue, curr, i);
-            }
-
-            *((npy_float64*)output_ptr) = NPY_NAN;
-        }
-
-        for (; i < window; ++i, curr_ptr += input_stride, output_ptr += output_stride) {
-            curr = *((npy_float64*)curr_ptr);
-
-            if (npy_isfinite(curr)) {
-                ++count;
-                monotonic_queue_push(queue, curr, i);
-            }
-
-            *((npy_float64*)output_ptr) = count >= min_count ? monotonic_queue_front_value(queue) : NPY_NAN;
-        }
-
-        for (; i < n; ++i, curr_ptr += input_stride, prev_ptr += input_stride, output_ptr += output_stride) {
-            curr = *((npy_float64*)curr_ptr);
-            prev = *((npy_float64*)prev_ptr);
-
-            if (npy_isfinite(prev)) {
-                --count;
-                if (monotonic_queue_front_index(queue) + window <= i) {
-                    monotonic_queue_pop_front(queue);
-                }
-            }
-
-            if (npy_isfinite(curr)) {
-                ++count;
-                monotonic_queue_push(queue, curr, i);
-            }
-
-            *((npy_float64*)output_ptr) = count >= min_count ? monotonic_queue_front_value(queue) : NPY_NAN;
-        }
-
-        PyArray_ITER_NEXT(input_iter);
-        PyArray_ITER_NEXT(output_iter);
+#define Rolling_Evict(value)                                                    \
+    --count;                                                                    \
+    if (monotonic_queue_method(front_index, SourceType)(queue) + window <= i) { \
+        monotonic_queue_method(pop_front, SourceType)(queue);                   \
     }
-    Py_END_ALLOW_THREADS;
-    monotonic_queue_free(queue);
-}
+
+#define Rolling_Compute() \
+    ((count >= min_count) ? monotonic_queue_method(front_value, SourceType)(queue) : NPY_NAN)
+
+#define Rolling_Finalize() \
+    monotonic_queue_method(free, SourceType)(queue);
+
+#define TargetType npy_float64
+
+#define SourceType npy_float64
+#include "rolling_impl.h"
+#undef SourceType
+
+#define SourceType npy_float32
+#include "rolling_impl.h"
+#undef SourceType
+
+#define __ROLLING_NO_VERIFY
+
+#define SourceType npy_int64
+#include "rolling_impl.h"
+#undef SourceType
+
+#define SourceType npy_int32
+#include "rolling_impl.h"
+#undef SourceType
+
+#undef __ROLLING_NO_VERIFY
+#undef TargetType
+
+#undef Rolling_Compute
+#undef Rolling_Init
+#undef Rolling_Reset
+#undef Rolling_Insert
+#undef Rolling_Evict
+#undef Rolling_Finalize
+
+#undef Method
 
 PyObject* rolling_min(PyObject* self, PyObject* args, PyObject* kwargs) {
     PyObject *input = NULL, *output = NULL;
@@ -102,28 +92,18 @@ PyObject* rolling_min(PyObject* self, PyObject* args, PyObject* kwargs) {
     min_count = min_count < 0 ? window : min_count;
     axis = axis < 0 ? ndim + axis : axis;
 
-    if (dtype == NPY_FLOAT32)
-        output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT32, 0);
-    else
-        output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT64, 0);
-
+    output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT64, 0);
     min = (PyArrayObject*)output;
 
     if (dtype == NPY_FLOAT64) {
-        rolling_min_float64(arr, min, window, min_count, axis);
-    }
-    // else if (dtype == NPY_FLOAT32) {
-    //     rolling_min_float32(arr, min, window, min_count, axis);
-    // } else if (dtype == NPY_INT64) {
-    //     rolling_min_int64(arr, min, window, min_count, axis);
-    // }
-    // else if (dtype == NPY_INT32) {
-    //     rolling_min_int32(arr, min, window, min_count, axis);
-    // }
-    // else if (dtype == NPY_BOOL) {
-    //     rolling_min_bool(arr, min, window, min_count, axis);
-    // }
-    else {
+        rolling_min_npy_float64(arr, min, window, min_count, axis);
+    } else if (dtype == NPY_FLOAT32) {
+        rolling_min_npy_float32(arr, min, window, min_count, axis);
+    } else if (dtype == NPY_INT64) {
+        rolling_min_npy_int64(arr, min, window, min_count, axis);
+    } else if (dtype == NPY_INT32) {
+        rolling_min_npy_int32(arr, min, window, min_count, axis);
+    } else {
         PyErr_SetString(PyExc_ValueError, "Unsupported dtype");
         return NULL;
     }

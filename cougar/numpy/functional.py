@@ -24,7 +24,7 @@ def rolling_sum(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
 
 def rolling_mean(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
     return pad(
-        sliding_window(arr, window, axis=axis).mean(axis=-1),
+        sliding_window(arr, window, axis=axis).mean(axis=-1).astype(np.float64),
         window - 1,
         axis,
     )
@@ -32,7 +32,7 @@ def rolling_mean(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
 
 def rolling_std(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
     return pad(
-        sliding_window(arr, window, axis=axis).std(axis=-1),
+        sliding_window(arr, window, axis=axis).std(axis=-1).astype(np.float64),
         window - 1,
         axis,
     )
@@ -40,7 +40,7 @@ def rolling_std(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
 
 def rolling_max(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
     return pad(
-        sliding_window(arr, window, axis=axis).max(axis=-1),
+        sliding_window(arr, window, axis=axis).max(axis=-1).astype(np.float64),
         window - 1,
         axis,
     )
@@ -48,7 +48,7 @@ def rolling_max(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
 
 def rolling_min(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
     return pad(
-        sliding_window(arr, window, axis=axis).min(axis=-1),
+        sliding_window(arr, window, axis=axis).min(axis=-1).astype(np.float64),
         window - 1,
         axis,
     )
