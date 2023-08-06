@@ -51,10 +51,7 @@ jobs:
         if: >-
           runner.os == 'Windows'
         run: >-
-          echo "s/{{VERSION}}/${{ github.ref_name }}/g"
-          echo "s/{{VERSION}}/$github.ref_name/g
-          echo "s/{{VERSION}}/(${{ github.ref_name }})/g}"
-          sed -i "s/{{VERSION}}/$github.ref_name/g" setup.py
+          sed -i "s/\{\{VERSION\}\}/${{ github.ref_name }}/g" setup.py
       - name: Show current `setup.py` file
         run: >-
           cat setup.py
