@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cougar"
-version = "0.2.0"
+version = "{{VERSION}}"
 description = ""
 license = "Apache-2.0"
 authors = ["Yunchong Gan <yunchong@pku.edu.cn>"]

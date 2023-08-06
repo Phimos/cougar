@@ -32,16 +32,19 @@ jobs:
           runner.os == 'Linux'
         run: >-
           sed -i "s/{{VERSION}}/${{ github.ref_name }}/g" setup.py
+          sed -i "s/{{VERSION}}/${{ github.ref_name }}/g" pyproject.toml
       - name: Update version in setup.py on macOS
         if: >-
           runner.os == 'macOS'
         run: >-
           sed -i '' "s/{{VERSION}}/${{ github.ref_name }}/g" setup.py
+          sed -i '' "s/{{VERSION}}/${{ github.ref_name }}/g" pyproject.toml
       - name: Update version in setup.py on Windows
         if: >-
           runner.os == 'Windows'
         run: >-
           sed -i "s/\{\{VERSION\}\}/${{ github.ref_name }}/g" setup.py
+          sed -i "s/\{\{VERSION\}\}/${{ github.ref_name }}/g" pyproject.toml
       - name: Build a binary wheel on Linux
         if : >-
           runner.os == 'Linux'
