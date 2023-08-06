@@ -7,135 +7,67 @@
 
 #include "stdio.h"
 
-#include "template.h"
+#define Method mean
 
-#define RollingMean_Init(itype, otype) \
-    Rolling_Init(itype, otype);        \
-    npy_##otype sum = 0;
+#define Rolling_Init(stype, ttype) \
+    size_t count = 0;              \
+    ttype sum = 0;
 
-#define RollingMean_InitIter() \
-    Rolling_InitIter();        \
+#define Rolling_Insert(value) \
+    sum += value;             \
+    ++count;
+
+#define Rolling_Evict(value) \
+    sum -= value;            \
+    --count;
+
+#define Rolling_Reset() \
+    count = 0;          \
     sum = 0;
 
-#define RollingMean_Compute_NoVerify() (sum / count)
-#define RollingMean_Compute() ((count >= min_count) ? RollingMean_Compute_NoVerify() : NPY_NAN)
+#define Rolling_Compute() ((count >= min_count) ? sum / count : NPY_NAN)
 
-#define RollingMean_Check(value) npy_isfinite(value)
+#define SourceType npy_float64
+#define TargetType npy_float64
 
-#define RollingMean_StepMinCount_NoVerify(itype, otype) \
-    Rolling_GetValue(curr, itype);                      \
-    sum += curr;                                        \
-    ++count;                                            \
-    Rolling_SetValue(output, NPY_NAN, otype);
+#include "rolling_impl.h"
 
-#define RollingMean_StepMinCount(itype, otype) \
-    Rolling_GetValue(curr, itype);             \
-    if (RollingMean_Check(curr)) {             \
-        sum += curr;                           \
-        ++count;                               \
-    }                                          \
-    Rolling_SetValue(output, NPY_NAN, otype);
+#undef SourceType
+#undef TargetType
 
-#define RollingMean_StepWindow_NoVerify(itype, otype) \
-    Rolling_GetValue(curr, itype);                    \
-    sum += curr;                                      \
-    ++count;                                          \
-    Rolling_SetValue(output, RollingMean_Compute_NoVerify(), otype);
+#define SourceType npy_float32
+#define TargetType npy_float32
 
-#define RollingMean_StepWindow(itype, otype) \
-    Rolling_GetValue(curr, itype);           \
-    if (RollingMean_Check(curr)) {           \
-        sum += curr;                         \
-        ++count;                             \
-    }                                        \
-    Rolling_SetValue(output, RollingMean_Compute(), otype);
+#include "rolling_impl.h"
 
-#define RollingMean_StepN_NoVerify(itype, otype) \
-    Rolling_GetValue(curr, itype);               \
-    Rolling_GetValue(prev, itype);               \
-    sum += curr;                                 \
-    sum -= prev;                                 \
-    Rolling_SetValue(output, RollingMean_Compute_NoVerify(), otype);
+#undef SourceType
+#undef TargetType
 
-#define RollingMean_StepN(itype, otype)   \
-    Rolling_GetValue(curr, itype);        \
-    Rolling_GetValue(prev, itype);        \
-    if (RollingMean_Check(curr)) {        \
-        if (RollingMean_Check(prev)) {    \
-            sum += curr - prev;           \
-        } else {                          \
-            sum += curr;                  \
-            ++count;                      \
-        }                                 \
-    } else if (RollingMean_Check(prev)) { \
-        sum -= prev;                      \
-        --count;                          \
-    }                                     \
-    Rolling_SetValue(output, RollingMean_Compute(), otype);
+#define __ROLLING_NO_VERIFY
+#define TargetType npy_float64
 
-#define RollingMean_Impl(itype, otype)                          \
-    static void rolling_mean_##itype(PyArrayObject* input,      \
-                                     PyArrayObject* output,     \
-                                     int window, int min_count, \
-                                     int axis) {                \
-        RollingMean_Init(itype, otype);                         \
-                                                                \
-        Py_BEGIN_ALLOW_THREADS;                                 \
-        Rolling_While {                                         \
-            RollingMean_InitIter();                             \
-                                                                \
-            Rolling_ForMinCount {                               \
-                RollingMean_StepMinCount(itype, otype);         \
-            }                                                   \
-                                                                \
-            Rolling_ForWindow {                                 \
-                RollingMean_StepWindow(itype, otype);           \
-            }                                                   \
-                                                                \
-            Rolling_ForN {                                      \
-                RollingMean_StepN(itype, otype);                \
-            }                                                   \
-                                                                \
-            Rolling_NextIter();                                 \
-        }                                                       \
-                                                                \
-        Py_END_ALLOW_THREADS;                                   \
-    }
+#define SourceType npy_int64
+#include "rolling_impl.h"
+#undef SourceType
 
-#define RollingMean_Impl_NoVerify(itype, otype)                             \
-    static void rolling_mean_##itype##_no_verify(PyArrayObject* input,      \
-                                                 PyArrayObject* output,     \
-                                                 int window, int min_count, \
-                                                 int axis) {                \
-        RollingMean_Init(itype, otype);                                     \
-                                                                            \
-        Py_BEGIN_ALLOW_THREADS;                                             \
-        Rolling_While {                                                     \
-            RollingMean_InitIter();                                         \
-                                                                            \
-            Rolling_ForMinCount {                                           \
-                RollingMean_StepMinCount_NoVerify(itype, otype);            \
-            }                                                               \
-                                                                            \
-            Rolling_ForWindow {                                             \
-                RollingMean_StepWindow_NoVerify(itype, otype);              \
-            }                                                               \
-                                                                            \
-            Rolling_ForN {                                                  \
-                RollingMean_StepN_NoVerify(itype, otype);                   \
-            }                                                               \
-                                                                            \
-            Rolling_NextIter();                                             \
-        }                                                                   \
-                                                                            \
-        Py_END_ALLOW_THREADS;                                               \
-    }
+#define SourceType npy_int32
+#include "rolling_impl.h"
+#undef SourceType
 
-RollingMean_Impl(float64, float64);
-RollingMean_Impl(float32, float32);
-RollingMean_Impl_NoVerify(int64, float64);
-RollingMean_Impl_NoVerify(int32, float64);
-RollingMean_Impl_NoVerify(bool, float64);
+#define SourceType npy_bool
+#include "rolling_impl.h"
+#undef SourceType
+
+#undef __ROLLING_NO_VERIFY
+#undef TargetType
+
+#undef Rolling_Compute
+#undef Rolling_Init
+#undef Rolling_Reset
+#undef Rolling_Insert
+#undef Rolling_Evict
+
+#undef Method
 
 static PyObject* rolling_mean(PyObject* self, PyObject* args, PyObject* kwargs) {
     PyObject *input = NULL, *output = NULL;
@@ -168,15 +100,15 @@ static PyObject* rolling_mean(PyObject* self, PyObject* args, PyObject* kwargs) 
     mean = (PyArrayObject*)output;
 
     if (dtype == NPY_FLOAT64) {
-        rolling_mean_float64(arr, mean, window, min_count, axis);
+        rolling_mean_npy_float64(arr, mean, window, min_count, axis);
     } else if (dtype == NPY_FLOAT32) {
-        rolling_mean_float32(arr, mean, window, min_count, axis);
+        rolling_mean_npy_float32(arr, mean, window, min_count, axis);
     } else if (dtype == NPY_INT64) {
-        rolling_mean_int64_no_verify(arr, mean, window, min_count, axis);
+        rolling_mean_npy_int64(arr, mean, window, min_count, axis);
     } else if (dtype == NPY_INT32) {
-        rolling_mean_int32_no_verify(arr, mean, window, min_count, axis);
+        rolling_mean_npy_int32(arr, mean, window, min_count, axis);
     } else if (dtype == NPY_BOOL) {
-        rolling_mean_bool_no_verify(arr, mean, window, min_count, axis);
+        rolling_mean_npy_bool(arr, mean, window, min_count, axis);
     } else {
         PyErr_SetString(PyExc_ValueError, "Unsupported dtype");
         return NULL;

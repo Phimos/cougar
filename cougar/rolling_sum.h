@@ -7,138 +7,70 @@
 
 #include "stdio.h"
 
-#include "template.h"
+#define Method sum
 
-#define RollingSum_Init(itype, otype) \
-    Rolling_Init(itype, otype);       \
-    npy_##otype sum = 0;
+#define Rolling_Init(stype, ttype) \
+    size_t count = 0;              \
+    ttype sum = 0;
 
-#define RollingSum_InitIter() \
-    Rolling_InitIter();       \
+#define Rolling_Insert(value) \
+    sum += value;             \
+    ++count;
+
+#define Rolling_Evict(value) \
+    sum -= value;            \
+    --count;
+
+#define Rolling_Reset() \
+    count = 0;          \
     sum = 0;
 
-#define RollingSum_Compute_NoVerify() (sum)
-#define RollingSum_Compute() ((count >= min_count) ? RollingSum_Compute_NoVerify() : NPY_NAN)
+#define Rolling_Compute() ((count >= min_count) ? sum : NPY_NAN)
 
-#define RollingSum_Check(value) npy_isfinite(value)
+#define SourceType npy_float64
+#define TargetType npy_float64
 
-#define RollingSum_StepMinCount_NoVerify(itype, otype) \
-    Rolling_GetValue(curr, itype);                     \
-    sum += curr;                                       \
-    ++count;                                           \
-    Rolling_SetValue(output, NPY_NAN, otype);
+#include "rolling_impl.h"
 
-#define RollingSum_StepMinCount(itype, otype) \
-    Rolling_GetValue(curr, itype);            \
-    if (RollingSum_Check(curr)) {             \
-        sum += curr;                          \
-        ++count;                              \
-    }                                         \
-    Rolling_SetValue(output, NPY_NAN, otype);
+#undef SourceType
+#undef TargetType
 
-#define RollingSum_StepWindow_NoVerify(itype, otype) \
-    Rolling_GetValue(curr, itype);                   \
-    sum += curr;                                     \
-    ++count;                                         \
-    Rolling_SetValue(output, RollingSum_Compute_NoVerify(), otype);
+#define SourceType npy_float32
+#define TargetType npy_float32
 
-#define RollingSum_StepWindow(itype, otype) \
-    Rolling_GetValue(curr, itype);          \
-    if (RollingSum_Check(curr)) {           \
-        sum += curr;                        \
-        ++count;                            \
-    }                                       \
-    Rolling_SetValue(output, RollingSum_Compute(), otype);
+#include "rolling_impl.h"
 
-#define RollingSum_StepN_NoVerify(itype, otype) \
-    Rolling_GetValue(curr, itype);              \
-    Rolling_GetValue(prev, itype);              \
-    sum += curr;                                \
-    sum -= prev;                                \
-    Rolling_SetValue(output, RollingSum_Compute_NoVerify(), otype);
+#undef SourceType
+#undef TargetType
 
-#define RollingSum_StepN(itype, otype)   \
-    Rolling_GetValue(curr, itype);       \
-    Rolling_GetValue(prev, itype);       \
-    if (RollingSum_Check(curr)) {        \
-        if (RollingSum_Check(prev)) {    \
-            sum += curr - prev;          \
-        } else {                         \
-            sum += curr;                 \
-            ++count;                     \
-        }                                \
-    } else if (RollingSum_Check(prev)) { \
-        sum -= prev;                     \
-        --count;                         \
-    }                                    \
-    Rolling_SetValue(output, RollingSum_Compute(), otype);
+#define __ROLLING_NO_VERIFY
+#define TargetType npy_float64
 
-#define RollingSum_Impl(itype, otype)                          \
-    static void rolling_sum_##itype(PyArrayObject* input,      \
-                                    PyArrayObject* output,     \
-                                    int window, int min_count, \
-                                    int axis) {                \
-        RollingSum_Init(itype, otype);                         \
-                                                               \
-        Py_BEGIN_ALLOW_THREADS;                                \
-        Rolling_While {                                        \
-            RollingSum_InitIter();                             \
-                                                               \
-            Rolling_ForMinCount {                              \
-                RollingSum_StepMinCount(itype, otype);         \
-            }                                                  \
-                                                               \
-            Rolling_ForWindow {                                \
-                RollingSum_StepWindow(itype, otype);           \
-            }                                                  \
-                                                               \
-            Rolling_ForN {                                     \
-                RollingSum_StepN(itype, otype);                \
-            }                                                  \
-                                                               \
-            Rolling_NextIter();                                \
-        }                                                      \
-                                                               \
-        Py_END_ALLOW_THREADS;                                  \
-    }
+#define SourceType npy_int64
+#include "rolling_impl.h"
+#undef SourceType
 
-#define RollingSum_Impl_NoVerify(itype, otype)                         \
-    static void rolling_sum_##itype##_no_verify(PyArrayObject* input,  \
-                                                PyArrayObject* output, \
-                                                size_t window,         \
-                                                size_t min_count,      \
-                                                int axis) {            \
-        RollingSum_Init(itype, otype);                                 \
-                                                                       \
-        Py_BEGIN_ALLOW_THREADS;                                        \
-        Rolling_While {                                                \
-            RollingSum_InitIter();                                     \
-                                                                       \
-            Rolling_ForMinCount {                                      \
-                RollingSum_StepMinCount_NoVerify(itype, otype);        \
-            }                                                          \
-                                                                       \
-            Rolling_ForWindow {                                        \
-                RollingSum_StepWindow_NoVerify(itype, otype);          \
-            }                                                          \
-                                                                       \
-            Rolling_ForN {                                             \
-                RollingSum_StepN_NoVerify(itype, otype);               \
-            }                                                          \
-                                                                       \
-            Rolling_NextIter();                                        \
-        }                                                              \
-                                                                       \
-        Py_END_ALLOW_THREADS;                                          \
-    }
+#define SourceType npy_int32
+#include "rolling_impl.h"
+#undef SourceType
 
-RollingSum_Impl(float64, float64);
-RollingSum_Impl(float32, float32);
-RollingSum_Impl_NoVerify(int64, float64);
-RollingSum_Impl_NoVerify(int32, float64);
-RollingSum_Impl_NoVerify(bool, float64);
+#define SourceType npy_bool
+#include "rolling_impl.h"
+#undef SourceType
 
-static PyObject* rolling_sum(PyObject* self, PyObject* args, PyObject* kwargs) {
+#undef __ROLLING_NO_VERIFY
+#undef TargetType
+
+#undef Rolling_Compute
+#undef Rolling_Init
+#undef Rolling_Reset
+#undef Rolling_Insert
+#undef Rolling_Evict
+
+#undef Method
+
+static PyObject*
+rolling_sum(PyObject* self, PyObject* args, PyObject* kwargs) {
     PyObject *input = NULL, *output = NULL;
     int window, min_count = -1, axis = -1;
 
@@ -169,15 +101,15 @@ static PyObject* rolling_sum(PyObject* self, PyObject* args, PyObject* kwargs) {
     sum = (PyArrayObject*)output;
 
     if (dtype == NPY_FLOAT64) {
-        rolling_sum_float64(arr, sum, window, min_count, axis);
+        rolling_sum_npy_float64(arr, sum, window, min_count, axis);
     } else if (dtype == NPY_FLOAT32) {
-        rolling_sum_float32(arr, sum, window, min_count, axis);
+        rolling_sum_npy_float32(arr, sum, window, min_count, axis);
     } else if (dtype == NPY_INT64) {
-        rolling_sum_int64_no_verify(arr, sum, window, min_count, axis);
+        rolling_sum_npy_int64(arr, sum, window, min_count, axis);
     } else if (dtype == NPY_INT32) {
-        rolling_sum_int32_no_verify(arr, sum, window, min_count, axis);
+        rolling_sum_npy_int32(arr, sum, window, min_count, axis);
     } else if (dtype == NPY_BOOL) {
-        rolling_sum_bool_no_verify(arr, sum, window, min_count, axis);
+        rolling_sum_npy_bool(arr, sum, window, min_count, axis);
     } else {
         PyErr_SetString(PyExc_ValueError, "Unsupported dtype");
         return NULL;
