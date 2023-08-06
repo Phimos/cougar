@@ -6,7 +6,7 @@ on:
       - "*"
 
 jobs:
-  build-n-publish:
+  build-and-store:
     name: Build and publish Python 🐍 distributions 📦 to PyPI
     runs-on: ${{ matrix.os }}
     strategy:
@@ -48,7 +48,25 @@ jobs:
       - name: Build a binary wheel
         run: >-
           python setup.py sdist bdist_wheel
-      - name: Publish distribution 📦 to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Store the binary wheel
+        uses: actions/upload-artifact@v2
         with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          name: python-package-distributions
+          path: dist/*.whl
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build-and-store
+    steps:
+    - name: Download the binary wheel
+      uses: actions/download-artifact@v2
+      with:
+        name: wheel
+        path: dist/
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        packages-dir: dist/
+        skip-existing: true
