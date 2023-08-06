@@ -65,6 +65,9 @@ jobs:
           runner.os == 'Windows'
         run: >-
           python setup.py sdist bdist_wheel
+      - name: Show the contents of dist/
+        run: >-
+          ls -l dist/
       - name: Store the binary wheel
         uses: actions/upload-artifact@v2
         with:
