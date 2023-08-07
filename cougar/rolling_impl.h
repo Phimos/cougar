@@ -52,7 +52,7 @@
 
 #ifdef Rolling_Insert
 #ifdef Rolling_Evict
-#ifdef Rolling_Compute
+#ifdef Rolling_Assign
 
 #ifndef Rolling_StepMinCount
 #define __ROLLING_STEP_MIN_COUNT
@@ -88,7 +88,7 @@
     Rolling_Assign();
 #endif  // Rolling_StepN
 
-#endif  // Rolling_Compute
+#endif  // Rolling_Assign
 #endif  // Rolling_Evict
 #endif  // Rolling_Insert
 
