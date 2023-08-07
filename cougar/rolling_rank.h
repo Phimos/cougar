@@ -75,7 +75,7 @@ static PyObject* rolling_rank(PyObject* self, PyObject* args, PyObject* kwargs) 
     static char* keywords[] = {"arr", "window", "min_count", "axis", NULL};
     PyArg_ParseTupleAndKeywords(args, kwargs, "Oi|ii", keywords, &input, &window, &min_count, &axis);
 
-    PyArrayObject *arr = NULL, *median = NULL;
+    PyArrayObject *arr = NULL, *rank = NULL;
     if (PyArray_Check(input)) {
         arr = (PyArrayObject*)input;
         Py_INCREF(arr);
@@ -92,20 +92,17 @@ static PyObject* rolling_rank(PyObject* self, PyObject* args, PyObject* kwargs) 
     min_count = min_count < 0 ? window : min_count;
     axis = axis < 0 ? ndim + axis : axis;
 
-    if (dtype == NPY_FLOAT32)
-        output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT32, 0);
-    else
-        output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT64, 0);
-    median = (PyArrayObject*)output;
+    output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT64, 0);
+    rank = (PyArrayObject*)output;
 
     if (dtype == NPY_FLOAT64) {
-        rolling_rank_npy_float64(arr, median, window, min_count, axis);
+        rolling_rank_npy_float64(arr, rank, window, min_count, axis);
     } else if (dtype == NPY_FLOAT32) {
-        rolling_rank_npy_float32(arr, median, window, min_count, axis);
+        rolling_rank_npy_float32(arr, rank, window, min_count, axis);
     } else if (dtype == NPY_INT64) {
-        rolling_rank_npy_int64(arr, median, window, min_count, axis);
+        rolling_rank_npy_int64(arr, rank, window, min_count, axis);
     } else if (dtype == NPY_INT32) {
-        rolling_rank_npy_int32(arr, median, window, min_count, axis);
+        rolling_rank_npy_int32(arr, rank, window, min_count, axis);
     } else {
         PyErr_SetString(PyExc_ValueError, "Unsupported dtype");
         return NULL;
