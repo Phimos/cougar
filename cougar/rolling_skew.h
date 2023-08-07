@@ -37,12 +37,12 @@
     m3 -= delta * delta * delta * (count + 1) * (count + 2) / count / count - 3 * delta * m2 / count; \
     m2 -= delta * delta * (count + 1) / count;
 
-#define Rolling_Assign()                                                                                                       \
-    if (count >= min_count) {                                                                                                  \
-        m2 = m2 < 0 ? 0 : m2;                                                                                                  \
-        *((TargetType*)target_ptr) = m3 * npy_sqrt(count) / (m2 * npy_sqrt(m2)) * npy_sqrt(count * (count - 1)) / (count - 2); \
-    } else {                                                                                                                   \
-        *((TargetType*)target_ptr) = NPY_NAN;                                                                                  \
+#define Rolling_Assign()                                                                                                                         \
+    if (count >= min_count) {                                                                                                                    \
+        m2 = m2 < 0 ? 0 : m2;                                                                                                                    \
+        *((TargetType*)target_ptr) = m3 * npy_sqrt((double)count) / (m2 * npy_sqrt(m2)) * npy_sqrt((double)(count * (count - 1))) / (count - 2); \
+    } else {                                                                                                                                     \
+        *((TargetType*)target_ptr) = NPY_NAN;                                                                                                    \
     }
 
 #define SourceType npy_float64
