@@ -1,6 +1,6 @@
 __version__ = "{{VERSION}}"
 
-from .rolling import (  # rolling_kurt,; rolling_skew,; rolling_std,; rolling_var,
+from .rolling import (
     rolling_argmax,
     rolling_argmin,
     rolling_max,
@@ -9,5 +9,7 @@ from .rolling import (  # rolling_kurt,; rolling_skew,; rolling_std,; rolling_va
     rolling_min,
     rolling_quantile,
     rolling_rank,
+    rolling_std,
     rolling_sum,
+    rolling_var,
 )

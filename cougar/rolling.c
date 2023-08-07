@@ -16,17 +16,17 @@
 #include "rolling_quantile.h"
 #include "rolling_rank.h"
 // #include "rolling_skew.h"
-// #include "rolling_std.h"
+#include "rolling_std.h"
 #include "rolling_sum.h"
-// #include "rolling_var.h"
+#include "rolling_var.h"
 
 /* Module method table */
 static PyMethodDef rolling_methods[] = {
     {"rolling_sum", (PyCFunction)rolling_sum, METH_VARARGS | METH_KEYWORDS, rolling_sum_doc},
     {"rolling_mean", (PyCFunction)rolling_mean, METH_VARARGS | METH_KEYWORDS, "Rolling mean"},
 
-    // {"rolling_std", (PyCFunction)rolling_std, METH_VARARGS | METH_KEYWORDS, "Rolling std"},
-    // {"rolling_var", (PyCFunction)rolling_var, METH_VARARGS | METH_KEYWORDS, "Rolling var"},
+    {"rolling_std", (PyCFunction)rolling_std, METH_VARARGS | METH_KEYWORDS, "Rolling std"},
+    {"rolling_var", (PyCFunction)rolling_var, METH_VARARGS | METH_KEYWORDS, "Rolling var"},
     // {"rolling_skew", (PyCFunction)rolling_skew, METH_VARARGS | METH_KEYWORDS, "Rolling skew"},
     // {"rolling_kurt", (PyCFunction)rolling_kurt, METH_VARARGS | METH_KEYWORDS, "Rolling kurt"},
 
