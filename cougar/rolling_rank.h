@@ -11,72 +11,62 @@
 
 #include "treap.h"
 
-static void rolling_rank_float64(PyArrayObject* input, PyArrayObject* output, int window, int min_count, int axis) {
-    Py_ssize_t n = PyArray_SHAPE(input)[axis];
-    Py_ssize_t input_stride = PyArray_STRIDES(input)[axis];
-    Py_ssize_t output_stride = PyArray_STRIDES(output)[axis];
+#define Method rank
 
-    PyArrayIterObject* input_iter = (PyArrayIterObject*)PyArray_IterAllButAxis((PyObject*)input, &axis);
-    PyArrayIterObject* output_iter = (PyArrayIterObject*)PyArray_IterAllButAxis((PyObject*)output, &axis);
+#define Rolling_Init()         \
+    size_t count = 0;          \
+    treap(SourceType)* treap = \
+        treap_method(init, SourceType)(window + 1);
 
-    char *output_ptr = NULL, *curr_ptr = NULL, *prev_ptr = NULL;
-    int count = 0, i = 0;
-    npy_float64 curr, prev;
-    npy_float64 rank;
+#define Rolling_Reset() \
+    count = 0;          \
+    treap_method(reset, SourceType)(treap);
 
-    struct treap_* treap = treap_init(window + 1);
+#define Rolling_Insert(value) \
+    ++count;                  \
+    treap_method(insert, SourceType)(treap, curr);
 
-    Py_BEGIN_ALLOW_THREADS;
-    while (input_iter->index < input_iter->size) {
-        prev_ptr = curr_ptr = PyArray_ITER_DATA(input_iter);
-        output_ptr = PyArray_ITER_DATA(output_iter);
-        count = 0;
+#define Rolling_Evict(value) \
+    --count;                 \
+    treap_method(remove, SourceType)(treap);
 
-        treap_reset(treap);
+#define Rolling_Compute() \
+    ((count >= min_count) ? (treap_method(query_rank, SourceType)(treap) - 1.0) / ((double)count - 1.0) * 2.0 - 1.0 : NPY_NAN)
 
-        for (i = 0; i < min_count - 1; ++i, curr_ptr += input_stride, output_ptr += output_stride) {
-            curr = *((npy_float64*)curr_ptr);
-            if (npy_isfinite(curr)) {
-                treap_insert(treap, curr);
-                ++count;
-            }
-            *((npy_float64*)output_ptr) = NPY_NAN;
-        }
+#define Rolling_Finalize() \
+    treap_method(free, SourceType)(treap);
 
-        for (; i < window; ++i, curr_ptr += input_stride, output_ptr += output_stride) {
-            curr = *((npy_float64*)curr_ptr);
-            if (npy_isfinite(curr)) {
-                treap_insert(treap, curr);
-                rank = treap_query_rank(treap);
-                ++count;
-            }
-            *((npy_float64*)output_ptr) = count >= min_count ? (rank - 1) / (count - 1) * 2.0 - 1.0 : NPY_NAN;
-        }
+#define TargetType npy_float64
 
-        for (; i < n; ++i, curr_ptr += input_stride, prev_ptr += input_stride, output_ptr += output_stride) {
-            curr = *((npy_float64*)curr_ptr);
-            prev = *((npy_float64*)prev_ptr);
+#define SourceType npy_float64
+#include "rolling_impl.h"
+#undef SourceType
 
-            if (npy_isfinite(prev)) {
-                treap_remove(treap);
-                --count;
-            }
+#define SourceType npy_float32
+#include "rolling_impl.h"
+#undef SourceType
 
-            if (npy_isfinite(curr)) {
-                treap_insert(treap, curr);
-                rank = treap_query_rank(treap);
-                ++count;
-            }
+#define __ROLLING_NO_VERIFY
 
-            *((npy_float64*)output_ptr) = count >= min_count ? (rank - 1) / (count - 1) * 2.0 - 1.0 : NPY_NAN;
-        }
+#define SourceType npy_int64
+#include "rolling_impl.h"
+#undef SourceType
 
-        PyArray_ITER_NEXT(input_iter);
-        PyArray_ITER_NEXT(output_iter);
-    }
-    Py_END_ALLOW_THREADS;
-    treap_free(treap);
-}
+#define SourceType npy_int32
+#include "rolling_impl.h"
+#undef SourceType
+
+#undef __ROLLING_NO_VERIFY
+#undef TargetType
+
+#undef Rolling_Compute
+#undef Rolling_Init
+#undef Rolling_Reset
+#undef Rolling_Insert
+#undef Rolling_Evict
+#undef Rolling_Finalize
+
+#undef Method
 
 static PyObject* rolling_rank(PyObject* self, PyObject* args, PyObject* kwargs) {
     PyObject *input = NULL, *output = NULL;
@@ -109,7 +99,13 @@ static PyObject* rolling_rank(PyObject* self, PyObject* args, PyObject* kwargs) 
     median = (PyArrayObject*)output;
 
     if (dtype == NPY_FLOAT64) {
-        rolling_rank_float64(arr, median, window, min_count, axis);
+        rolling_rank_npy_float64(arr, median, window, min_count, axis);
+    } else if (dtype == NPY_FLOAT32) {
+        rolling_rank_npy_float32(arr, median, window, min_count, axis);
+    } else if (dtype == NPY_INT64) {
+        rolling_rank_npy_int64(arr, median, window, min_count, axis);
+    } else if (dtype == NPY_INT32) {
+        rolling_rank_npy_int32(arr, median, window, min_count, axis);
     } else {
         PyErr_SetString(PyExc_ValueError, "Unsupported dtype");
         return NULL;
