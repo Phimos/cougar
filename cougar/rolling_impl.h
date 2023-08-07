@@ -42,6 +42,14 @@
 #define Rolling_Finalize() ;
 #endif  // Rolling_Finalize
 
+#ifdef Rolling_Compute
+#ifndef Rolling_Assign
+#define __ROLLING_ASSIGN
+#define Rolling_Assign() \
+    Rolling_SetValue(target, Rolling_Compute(), TargetType)
+#endif  // Rolling_Assign
+#endif  // Rolling_Compute
+
 #ifdef Rolling_Insert
 #ifdef Rolling_Evict
 #ifdef Rolling_Compute
@@ -63,7 +71,7 @@
     if (Rolling_Valid(curr)) {          \
         Rolling_Insert(curr);           \
     }                                   \
-    Rolling_SetValue(target, Rolling_Compute(), TargetType);
+    Rolling_Assign();
 #endif  // Rolling_StepWindow
 
 #ifndef Rolling_StepN
@@ -77,7 +85,7 @@
     if (Rolling_Valid(prev)) {          \
         Rolling_Evict(prev);            \
     }                                   \
-    Rolling_SetValue(target, Rolling_Compute(), TargetType)
+    Rolling_Assign();
 #endif  // Rolling_StepN
 
 #endif  // Rolling_Compute
@@ -149,6 +157,11 @@ Rolling_Main(Method)
 #undef Rolling_Finalize
 #undef __ROLLING_FINALIZE
 #endif  // __ROLLING_FINALIZE
+
+#ifdef __ROLLING_ASSIGN
+#undef Rolling_Assign
+#undef __ROLLING_ASSIGN
+#endif  // __ROLLING_ASSIGN
 
 #endif  // Method
 #endif  // TargetType
