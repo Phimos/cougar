@@ -15,27 +15,35 @@
                                                       int window, int min_count, \
                                                       int axis, int ddof)
 
-#define Rolling_Init() \
-    size_t count = 0;  \
-    TargetType delta, mean, m2, m3;
+#define Rolling_Init()                \
+    size_t count = 0;                 \
+    TargetType icount;                \
+    TargetType delta, delta2, delta3; \
+    TargetType mean, m2, m3;
 
 #define Rolling_Reset() \
     count = 0;          \
     mean = m2 = m3 = 0;
 
-#define Rolling_Insert(value)                                                                         \
-    ++count;                                                                                          \
-    delta = value - mean;                                                                             \
-    mean += delta / count;                                                                            \
-    m3 += delta * delta * delta * (count - 1) * (count - 2) / count / count - 3 * delta * m2 / count; \
-    m2 += delta * delta * (count - 1) / count;
+#define Rolling_Insert(value)                                                 \
+    ++count;                                                                  \
+    delta = value - mean;                                                     \
+    delta2 = delta * delta;                                                   \
+    delta3 = delta * delta2;                                                  \
+    icount = 1.0 / (TargetType)count;                                         \
+    mean += delta * icount;                                                   \
+    m3 += delta3 * (1 - icount) * (1 - 2 * icount) - 3 * delta * m2 * icount; \
+    m2 += delta2 * (1 - icount);
 
-#define Rolling_Evict(value)                                                                          \
-    --count;                                                                                          \
-    delta = value - mean;                                                                             \
-    mean -= delta / count;                                                                            \
-    m3 -= delta * delta * delta * (count + 1) * (count + 2) / count / count - 3 * delta * m2 / count; \
-    m2 -= delta * delta * (count + 1) / count;
+#define Rolling_Evict(value)                                                  \
+    --count;                                                                  \
+    delta = value - mean;                                                     \
+    delta2 = delta * delta;                                                   \
+    delta3 = delta * delta2;                                                  \
+    icount = 1.0 / (TargetType)count;                                         \
+    mean -= delta * icount;                                                   \
+    m3 -= delta3 * (1 + icount) * (1 + 2 * icount) - 3 * delta * m2 * icount; \
+    m2 -= delta2 * (1 + icount);
 
 #define Rolling_Assign()                                                                                                                         \
     if (count >= min_count) {                                                                                                                    \
