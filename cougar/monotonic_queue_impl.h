@@ -5,81 +5,84 @@
 
 #define concat(a, b) a##_##b
 
+#define monotonic_queue_pair(dtype) struct concat(monotonic_queue_pair, dtype)
 #define monotonic_queue(dtype) struct concat(monotonic_queue, dtype)
 #define method(name, dtype) concat(monotonic_queue_##name, dtype)
 
+monotonic_queue_pair(T) {
+    T value;
+    size_t index;
+};
+
 monotonic_queue(T) {
     size_t size, capacity;
-    size_t front, back;
     size_t increasing;
-    T* buffer;
-    size_t* indices;
+    monotonic_queue_pair(T) * head, *tail;
+    monotonic_queue_pair(T) * buffer, *buffer_end;
 };
 
 static inline void method(reset, T)(monotonic_queue(T) * queue) {
     queue->size = 0;
-    queue->front = 0;
-    queue->back = 0;
+    queue->head = queue->tail = queue->buffer;
 }
 
 static inline monotonic_queue(T) * method(init, T)(size_t capacity, size_t increasing) {
     monotonic_queue(T)* queue = (monotonic_queue(T)*)malloc(sizeof(monotonic_queue(T)));
     queue->capacity = capacity;
     queue->increasing = increasing;
-    queue->buffer = (T*)malloc(sizeof(T) * capacity);
-    queue->indices = (size_t*)malloc(sizeof(size_t) * capacity);
+    queue->buffer = (monotonic_queue_pair(T)*)malloc(sizeof(monotonic_queue_pair(T)) * capacity);
+    queue->buffer_end = queue->buffer + capacity - 1;
     method(reset, T)(queue);
     return queue;
 }
 
 static inline void method(free, T)(monotonic_queue(T) * queue) {
     free(queue->buffer);
-    free(queue->indices);
     free(queue);
 }
 
-static inline size_t method(next, T)(monotonic_queue(T) * queue, size_t index) {
-    return ((index + 1) < queue->capacity) ? (index + 1) : 0;
+static inline monotonic_queue_pair(T) * method(next, T)(monotonic_queue(T) * queue, monotonic_queue_pair(T) * pointer) {
+    return (pointer == queue->buffer_end) ? (queue->buffer) : (pointer + 1);
 }
 
-static inline size_t method(prev, T)(monotonic_queue(T) * queue, size_t index) {
-    return (index > 0) ? (index - 1) : (queue->capacity - 1);
+static inline monotonic_queue_pair(T) * method(prev, T)(monotonic_queue(T) * queue, monotonic_queue_pair(T) * pointer) {
+    return (pointer == queue->buffer) ? (queue->buffer_end) : (pointer - 1);
 }
 
 static inline T method(front_value, T)(monotonic_queue(T) * queue) {
-    return queue->buffer[queue->front];
+    return queue->head->value;
 }
 
 static inline size_t method(front_index, T)(monotonic_queue(T) * queue) {
-    return queue->indices[queue->front];
+    return queue->head->index;
 }
 
 static inline T method(back_value, T)(monotonic_queue(T) * queue) {
-    return queue->buffer[queue->back];
+    return queue->tail->value;
 }
 
 static inline size_t method(back_index, T)(monotonic_queue(T) * queue) {
-    return queue->indices[queue->back];
+    return queue->tail->index;
 }
 
 static inline void method(pop_front, T)(monotonic_queue(T) * queue) {
-    queue->front = method(next, T)(queue, queue->front);
+    queue->head = method(next, T)(queue, queue->head);
     queue->size--;
 }
 
 static inline void method(pop_back, T)(monotonic_queue(T) * queue) {
-    queue->back = method(prev, T)(queue, queue->back);
+    queue->tail = method(prev, T)(queue, queue->tail);
     queue->size--;
 }
 
 static inline void method(push_back, T)(monotonic_queue(T) * queue, T value, size_t index) {
     if (queue->size == 0) {
-        queue->front = queue->back = 0;
+        queue->head = queue->tail = queue->buffer;
     } else {
-        queue->back = method(next, T)(queue, queue->back);
+        queue->tail = method(next, T)(queue, queue->tail);
     }
-    queue->buffer[queue->back] = value;
-    queue->indices[queue->back] = index;
+    queue->tail->value = value;
+    queue->tail->index = index;
     queue->size++;
 }
 
@@ -105,6 +108,7 @@ static inline void method(push, T)(monotonic_queue(T) * queue, T value, size_t i
 }
 
 #undef method
+#undef monotonic_queue_pair
 #undef monotonic_queue
 #undef concat
 
