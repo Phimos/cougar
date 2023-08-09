@@ -50,6 +50,18 @@
 #endif  // Rolling_Assign
 #endif  // Rolling_Compute
 
+#ifndef Rolling_AssignWindow
+#define __ROLLING_ASSIGN_WINDOW
+#define Rolling_AssignWindow() \
+    Rolling_Assign()
+#endif  // Rolling_AssignWindow
+
+#ifndef Rolling_AssignN
+#define __ROLLING_ASSIGN_N
+#define Rolling_AssignN() \
+    Rolling_Assign()
+#endif  // Rolling_AssignN
+
 #ifdef Rolling_Insert
 #ifdef Rolling_Evict
 #ifdef Rolling_Assign
@@ -71,7 +83,7 @@
     if (Rolling_Valid(curr)) {          \
         Rolling_Insert(curr);           \
     }                                   \
-    Rolling_Assign();
+    Rolling_AssignWindow();
 #endif  // Rolling_StepWindow
 
 #ifndef Rolling_StepN
@@ -85,7 +97,7 @@
     if (Rolling_Valid(prev)) {          \
         Rolling_Evict(prev);            \
     }                                   \
-    Rolling_Assign();
+    Rolling_AssignN();
 #endif  // Rolling_StepN
 
 #endif  // Rolling_Assign
@@ -162,6 +174,16 @@ Rolling_Main(Method)
 #undef Rolling_Assign
 #undef __ROLLING_ASSIGN
 #endif  // __ROLLING_ASSIGN
+
+#ifdef __ROLLING_ASSIGN_WINDOW
+#undef Rolling_AssignWindow
+#undef __ROLLING_ASSIGN_WINDOW
+#endif  // __ROLLING_ASSIGN_WINDOW
+
+#ifdef __ROLLING_ASSIGN_N
+#undef Rolling_AssignN
+#undef __ROLLING_ASSIGN_N
+#endif  // __ROLLING_ASSIGN_N
 
 #endif  // Method
 #endif  // TargetType
