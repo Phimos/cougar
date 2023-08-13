@@ -6,12 +6,15 @@
 
 // #define __ROLLING_NO_VERIFY
 
+// #define __COUGAR_NO_VERIFY__ // TODO: add this to cougar.h -> control there is no need to verify
+// #define __COUGAR_COUNTER__ // TODO: add this to cougar.h -> control whether to use a counter or not
+
 #ifdef SourceType
 #ifdef TargetType
 #ifdef Method
 
 #ifndef Rolling_Valid
-#define __ROLLING_VALID
+#define __ROLLING_VALID__
 #ifdef __ROLLING_NO_VERIFY
 #define Rolling_Valid(value) (1)
 #else  // __ROLLING_NO_VERIFY
@@ -20,7 +23,7 @@
 #endif  // Rolling_Valid
 
 #ifndef Rolling_Signature
-#define __ROLLING_SIGNATURE
+#define __ROLLING_SIGNATURE__
 #define Rolling_Signature(name, dtype)                                        \
     static void Rolling_Concat(rolling_##name, dtype)(PyArrayObject * source, \
                                                       PyArrayObject * target, \
@@ -28,36 +31,36 @@
 #endif  // Rolling_Signature
 
 #ifndef Rolling_Init
-#define __ROLLING_INIT
+#define __ROLLING_INIT__
 #define Rolling_Init() ;
 #endif  // Rolling_Init
 
 #ifndef Rolling_Reset
-#define __ROLLING_RESET
+#define __ROLLING_RESET__
 #define Rolling_Reset() ;
 #endif  // Rolling_Reset
 
 #ifndef Rolling_Finalize
-#define __ROLLING_FINALIZE
+#define __ROLLING_FINALIZE__
 #define Rolling_Finalize() ;
 #endif  // Rolling_Finalize
 
 #ifdef Rolling_Compute
 #ifndef Rolling_Assign
-#define __ROLLING_ASSIGN
+#define __ROLLING_ASSIGN__
 #define Rolling_Assign() \
     Rolling_SetValue(target, Rolling_Compute(), TargetType)
 #endif  // Rolling_Assign
 #endif  // Rolling_Compute
 
 #ifndef Rolling_AssignWindow
-#define __ROLLING_ASSIGN_WINDOW
+#define __ROLLING_ASSIGN_WINDOW__
 #define Rolling_AssignWindow() \
     Rolling_Assign()
 #endif  // Rolling_AssignWindow
 
 #ifndef Rolling_AssignN
-#define __ROLLING_ASSIGN_N
+#define __ROLLING_ASSIGN_N__
 #define Rolling_AssignN() \
     Rolling_Assign()
 #endif  // Rolling_AssignN
@@ -67,7 +70,7 @@
 #ifdef Rolling_Assign
 
 #ifndef Rolling_StepMinCount
-#define __ROLLING_STEP_MIN_COUNT
+#define __ROLLING_STEP_MIN_COUNT__
 #define Rolling_StepMinCount()          \
     Rolling_GetValue(curr, SourceType); \
     if (Rolling_Valid(curr)) {          \
@@ -77,7 +80,7 @@
 #endif  // Rolling_StepMinCount
 
 #ifndef Rolling_StepWindow
-#define __ROLLING_STEP_WINDOW
+#define __ROLLING_STEP_WINDOW__
 #define Rolling_StepWindow()            \
     Rolling_GetValue(curr, SourceType); \
     if (Rolling_Valid(curr)) {          \
@@ -87,7 +90,7 @@
 #endif  // Rolling_StepWindow
 
 #ifndef Rolling_StepN
-#define __ROLLING_STEP_N
+#define __ROLLING_STEP_N__
 #define Rolling_StepN()                 \
     Rolling_GetValue(curr, SourceType); \
     Rolling_GetValue(prev, SourceType); \
@@ -130,60 +133,60 @@
 
 Rolling_Main(Method)
 
-#ifdef __ROLLING_VALID
+#ifdef __ROLLING_VALID__
 #undef Rolling_Valid
-#undef __ROLLING_VALID
-#endif  // __ROLLING_VALID
+#undef __ROLLING_VALID__
+#endif  // __ROLLING_VALID__
 
-#ifdef __ROLLING_SIGNATURE
+#ifdef __ROLLING_SIGNATURE__
 #undef Rolling_Signature
-#undef __ROLLING_SIGNATURE
-#endif  // __ROLLING_SIGNATURE
+#undef __ROLLING_SIGNATURE__
+#endif  // __ROLLING_SIGNATURE__
 
-#ifdef __ROLLING_INIT
+#ifdef __ROLLING_INIT__
 #undef Rolling_Init
-#undef __ROLLING_INIT
-#endif  // __ROLLING_INIT
+#undef __ROLLING_INIT__
+#endif  // __ROLLING_INIT__
 
-#ifdef __ROLLING_STEP_MIN_COUNT
+#ifdef __ROLLING_STEP_MIN_COUNT__
 #undef Rolling_StepMinCount
-#undef __ROLLING_STEP_MIN_COUNT
-#endif  // __ROLLING_STEP_MIN_COUNT
+#undef __ROLLING_STEP_MIN_COUNT__
+#endif  // __ROLLING_STEP_MIN_COUNT__
 
-#ifndef __ROLLING_STEP_WINDOW
+#ifndef __ROLLING_STEP_WINDOW__
 #undef Rolling_StepWindow
-#undef __ROLLING_STEP_WINDOW
-#endif  // __ROLLING_STEP_WINDOW
+#undef __ROLLING_STEP_WINDOW__
+#endif  // __ROLLING_STEP_WINDOW__
 
-#ifdef __ROLLING_STEP_N
+#ifdef __ROLLING_STEP_N__
 #undef Rolling_StepN
-#undef __ROLLING_STEP_N
-#endif  // __ROLLING_STEP_N
+#undef __ROLLING_STEP_N__
+#endif  // __ROLLING_STEP_N__
 
-#ifdef __ROLLING_RESET
+#ifdef __ROLLING_RESET__
 #undef Rolling_Reset
-#undef __ROLLING_RESET
-#endif  // __ROLLING_RESET
+#undef __ROLLING_RESET__
+#endif  // __ROLLING_RESET__
 
-#ifdef __ROLLING_FINALIZE
+#ifdef __ROLLING_FINALIZE__
 #undef Rolling_Finalize
-#undef __ROLLING_FINALIZE
-#endif  // __ROLLING_FINALIZE
+#undef __ROLLING_FINALIZE__
+#endif  // __ROLLING_FINALIZE__
 
-#ifdef __ROLLING_ASSIGN
+#ifdef __ROLLING_ASSIGN__
 #undef Rolling_Assign
-#undef __ROLLING_ASSIGN
-#endif  // __ROLLING_ASSIGN
+#undef __ROLLING_ASSIGN__
+#endif  // __ROLLING_ASSIGN__
 
-#ifdef __ROLLING_ASSIGN_WINDOW
+#ifdef __ROLLING_ASSIGN_WINDOW__
 #undef Rolling_AssignWindow
-#undef __ROLLING_ASSIGN_WINDOW
-#endif  // __ROLLING_ASSIGN_WINDOW
+#undef __ROLLING_ASSIGN_WINDOW__
+#endif  // __ROLLING_ASSIGN_WINDOW__
 
-#ifdef __ROLLING_ASSIGN_N
+#ifdef __ROLLING_ASSIGN_N__
 #undef Rolling_AssignN
-#undef __ROLLING_ASSIGN_N
-#endif  // __ROLLING_ASSIGN_N
+#undef __ROLLING_ASSIGN_N__
+#endif  // __ROLLING_ASSIGN_N__
 
 #endif  // Method
 #endif  // TargetType
