@@ -4,7 +4,7 @@
 
 #include "rolling_template.h"
 
-// #define __ROLLING_NO_VERIFY
+// #define __COUGAR_NO_VERIFY__
 
 // #define __COUGAR_NO_VERIFY__ // TODO: add this to cougar.h -> control there is no need to verify
 // #define __COUGAR_COUNTER__ // TODO: add this to cougar.h -> control whether to use a counter or not
@@ -15,11 +15,11 @@
 
 #ifndef Rolling_Valid
 #define __ROLLING_VALID__
-#ifdef __ROLLING_NO_VERIFY
+#ifdef __COUGAR_NO_VERIFY__
 #define Rolling_Valid(value) (1)
-#else  // __ROLLING_NO_VERIFY
+#else  // __COUGAR_NO_VERIFY__
 #define Rolling_Valid(value) (npy_isfinite(value))
-#endif  // __ROLLING_NO_VERIFY
+#endif  // __COUGAR_NO_VERIFY__
 #endif  // Rolling_Valid
 
 #ifndef Rolling_Signature

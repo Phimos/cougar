@@ -54,7 +54,7 @@
 #include "rolling_impl.h"
 #undef SourceType
 
-#define __ROLLING_NO_VERIFY
+#define __COUGAR_NO_VERIFY__
 
 #define SourceType npy_int64
 #include "rolling_impl.h"
@@ -64,7 +64,7 @@
 #include "rolling_impl.h"
 #undef SourceType
 
-#undef __ROLLING_NO_VERIFY
+#undef __COUGAR_NO_VERIFY__
 #undef TargetType
 
 #undef Rolling_Signature

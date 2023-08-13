@@ -51,7 +51,7 @@
 #undef SourceType
 #undef TargetType
 
-#define __ROLLING_NO_VERIFY
+#define __COUGAR_NO_VERIFY__
 #define TargetType npy_float64
 
 #define SourceType npy_int64
@@ -66,7 +66,7 @@
 #include "rolling_impl.h"
 #undef SourceType
 
-#undef __ROLLING_NO_VERIFY
+#undef __COUGAR_NO_VERIFY__
 #undef TargetType
 
 #undef Rolling_Compute
