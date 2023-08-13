@@ -38,6 +38,22 @@ def rolling_std(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
     )
 
 
+def rolling_skew(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
+    return pad(
+        sliding_window(arr, window, axis=axis).skew(axis=-1).astype(np.float64),
+        window - 1,
+        axis,
+    )
+
+
+def rolling_kurt(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
+    return pad(
+        sliding_window(arr, window, axis=axis).kurt(axis=-1).astype(np.float64),
+        window - 1,
+        axis,
+    )
+
+
 def rolling_max(arr: np.ndarray, window: int, axis: int = -1) -> np.ndarray:
     return pad(
         sliding_window(arr, window, axis=axis).max(axis=-1).astype(np.float64),
