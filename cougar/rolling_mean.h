@@ -27,24 +27,17 @@
 
 #define Rolling_Compute() ((count >= min_count) ? sum / count : NPY_NAN)
 
-#define SourceType npy_float64
 #define TargetType npy_float64
 
+#define SourceType npy_float64
 #include "rolling_impl.h"
-
 #undef SourceType
-#undef TargetType
 
 #define SourceType npy_float32
-#define TargetType npy_float64
-
 #include "rolling_impl.h"
-
 #undef SourceType
-#undef TargetType
 
 #define __COUGAR_NO_VERIFY__
-#define TargetType npy_float64
 
 #define SourceType npy_int64
 #include "rolling_impl.h"
