@@ -30,7 +30,8 @@
     --count;                 \
     treap_method(remove, SourceType)(treap);
 
-#define Rolling_Compute() (count > 1 ? ((treap_method(query_rank, SourceType)(treap) - 1.0) / ((double)count - 1.0) * 2.0 - 1.0) : 0.0)
+#define Rolling_Compute() \
+    (count > 1 ? ((treap_method(query_rank, SourceType)(treap) - 1.0) / ((double)count - 1.0) * 2.0 - 1.0) : 0.0)
 
 #define Rolling_Finalize() \
     treap_method(free, SourceType)(treap);
