@@ -48,8 +48,15 @@
 #ifdef Rolling_Compute
 #ifndef Rolling_Assign
 #define __ROLLING_ASSIGN__
+#ifdef __COUGAR_NO_VERIFY__
 #define Rolling_Assign() \
     Rolling_SetValue(target, Rolling_Compute(), TargetType)
+#else
+#define Rolling_Assign()                                                   \
+    Rolling_SetValue(target,                                               \
+                     ((count >= min_count) ? Rolling_Compute() : NPY_NAN), \
+                     TargetType)
+#endif  // __COUGAR_NO_VERIFY__
 #endif  // Rolling_Assign
 #endif  // Rolling_Compute
 

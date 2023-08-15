@@ -30,8 +30,7 @@
         monotonic_queue_method(pop_front, SourceType)(queue);                   \
     }
 
-#define Rolling_Compute() \
-    ((count >= min_count) ? monotonic_queue_method(front_value, SourceType)(queue) : NPY_NAN)
+#define Rolling_Compute() (monotonic_queue_method(front_value, SourceType)(queue))
 
 #define Rolling_Finalize() \
     monotonic_queue_method(free, SourceType)(queue);

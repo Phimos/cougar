@@ -33,7 +33,7 @@
     mean -= delta / count;   \
     m2 -= delta * (value - mean);
 
-#define Rolling_Compute() ((count >= min_count) ? npy_sqrt((m2 = m2 < 0 ? 0 : m2) / (count - ddof)) : NPY_NAN)
+#define Rolling_Compute() (npy_sqrt((m2 = m2 < 0 ? 0 : m2) / (count - ddof)))
 
 #define SourceType npy_float64
 #define TargetType npy_float64

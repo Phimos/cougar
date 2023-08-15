@@ -25,7 +25,7 @@
     count = 0;          \
     sum = 0;
 
-#define Rolling_Compute() ((count >= min_count) ? sum : NPY_NAN)
+#define Rolling_Compute() (sum)
 
 #define TargetType npy_float64
 

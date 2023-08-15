@@ -38,8 +38,7 @@
     --count;                 \
     treap_method(remove, SourceType)(treap);
 
-#define Rolling_Compute() \
-    ((count >= min_count) ? (treap_method(query_quantile, SourceType)(treap, q)) : NPY_NAN)
+#define Rolling_Compute() (treap_method(query_quantile, SourceType)(treap, q))
 
 #define Rolling_Finalize() \
     treap_method(free, SourceType)(treap);
