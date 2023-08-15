@@ -1,6 +1,8 @@
 #ifndef __MONOTONIC_QUEUE_H__
 #define __MONOTONIC_QUEUE_H__
 
+#include "numpy/npy_common.h"
+
 #include "math.h"
 #include "stdlib.h"
 

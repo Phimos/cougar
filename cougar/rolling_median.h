@@ -9,71 +9,63 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-#include "heap.h"
+#include "median_heap.h"
 
-static void rolling_median_float64(PyArrayObject* input, PyArrayObject* output, int window, int min_count, int axis) {
-    Py_ssize_t n = PyArray_SHAPE(input)[axis];
-    Py_ssize_t input_stride = PyArray_STRIDES(input)[axis];
-    Py_ssize_t output_stride = PyArray_STRIDES(output)[axis];
+#define Method median
 
-    PyArrayIterObject* input_iter = (PyArrayIterObject*)PyArray_IterAllButAxis((PyObject*)input, &axis);
-    PyArrayIterObject* output_iter = (PyArrayIterObject*)PyArray_IterAllButAxis((PyObject*)output, &axis);
+#define Rolling_Init()              \
+    size_t count = 0;               \
+    median_heap(SourceType)* heap = \
+        median_heap_method(init, SourceType)(window / 2 + 1, window / 2 + 1);
 
-    char *output_ptr = NULL, *curr_ptr = NULL, *prev_ptr = NULL;
-    int count = 0, i = 0;
-    npy_float64 curr, prev;
+#define Rolling_Reset() \
+    count = 0;          \
+    median_heap_method(reset, SourceType)(heap);
 
-    struct dual_heap_* heap = dual_heap_init(window / 2 + 1, window / 2 + 1);
+#define Rolling_Insert(value) \
+    ++count;                  \
+    median_heap_method(push, SourceType)(heap, curr);
 
-    Py_BEGIN_ALLOW_THREADS;
-    while (input_iter->index < input_iter->size) {
-        prev_ptr = curr_ptr = PyArray_ITER_DATA(input_iter);
-        output_ptr = PyArray_ITER_DATA(output_iter);
-        count = 0;
+#define Rolling_Evict(value) \
+    --count;                 \
+    median_heap_method(pop, SourceType)(heap);
 
-        dual_heap_clear(heap);
+#define Rolling_Compute() (median_heap_method(query_median, SourceType)(heap))
 
-        for (i = 0; i < min_count - 1; ++i, curr_ptr += input_stride, output_ptr += output_stride) {
-            curr = *((npy_float64*)curr_ptr);
-            if (npy_isfinite(curr)) {
-                dual_heap_push(heap, curr);
-                ++count;
-            }
-            *((npy_float64*)output_ptr) = NPY_NAN;
-        }
+#define Rolling_Finalize() \
+    median_heap_method(free, SourceType)(heap);
 
-        for (; i < window; ++i, curr_ptr += input_stride, output_ptr += output_stride) {
-            curr = *((npy_float64*)curr_ptr);
-            if (npy_isfinite(curr)) {
-                dual_heap_push(heap, curr);
-                ++count;
-            }
-            *((npy_float64*)output_ptr) = count >= min_count ? dual_heap_get_median(heap) : NPY_NAN;
-        }
+#define TargetType npy_float64
 
-        for (; i < n; ++i, curr_ptr += input_stride, prev_ptr += input_stride, output_ptr += output_stride) {
-            curr = *((npy_float64*)curr_ptr);
-            prev = *((npy_float64*)prev_ptr);
+#define SourceType npy_float64
+#include "rolling_impl.h"
+#undef SourceType
 
-            if (npy_isfinite(prev)) {
-                dual_heap_pop(heap);
-                --count;
-            }
+#define SourceType npy_float32
+#include "rolling_impl.h"
+#undef SourceType
 
-            if (npy_isfinite(curr)) {
-                dual_heap_push(heap, curr);
-                ++count;
-            }
+#define __COUGAR_NO_VERIFY__
 
-            *((npy_float64*)output_ptr) = count >= min_count ? dual_heap_get_median(heap) : NPY_NAN;
-        }
+#define SourceType npy_int64
+#include "rolling_impl.h"
+#undef SourceType
 
-        PyArray_ITER_NEXT(input_iter);
-        PyArray_ITER_NEXT(output_iter);
-    }
-    dual_heap_free(heap);
-    Py_END_ALLOW_THREADS;
-}
+#define SourceType npy_int32
+#include "rolling_impl.h"
+#undef SourceType
+
+#undef __COUGAR_NO_VERIFY__
+#undef TargetType
+
+#undef Rolling_Finalize
+#undef Rolling_Compute
+#undef Rolling_Evict
+#undef Rolling_Insert
+#undef Rolling_Reset
+#undef Rolling_Init
+
+#undef Method
 
 static PyObject* rolling_median(PyObject* self, PyObject* args, PyObject* kwargs) {
     PyObject *input = NULL, *output = NULL;
@@ -99,14 +91,17 @@ static PyObject* rolling_median(PyObject* self, PyObject* args, PyObject* kwargs
     min_count = min_count < 0 ? window : min_count;
     axis = axis < 0 ? ndim + axis : axis;
 
-    if (dtype == NPY_FLOAT32)
-        output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT32, 0);
-    else
-        output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT64, 0);
+    output = PyArray_EMPTY(PyArray_NDIM(arr), PyArray_SHAPE(arr), NPY_FLOAT64, 0);
     median = (PyArrayObject*)output;
 
     if (dtype == NPY_FLOAT64) {
-        rolling_median_float64(arr, median, window, min_count, axis);
+        rolling_median_npy_float64(arr, median, window, min_count, axis);
+    } else if (dtype == NPY_FLOAT32) {
+        rolling_median_npy_float32(arr, median, window, min_count, axis);
+    } else if (dtype == NPY_INT64) {
+        rolling_median_npy_int64(arr, median, window, min_count, axis);
+    } else if (dtype == NPY_INT32) {
+        rolling_median_npy_int32(arr, median, window, min_count, axis);
     } else {
         PyErr_SetString(PyExc_ValueError, "Unsupported dtype");
         return NULL;

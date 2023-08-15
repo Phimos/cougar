@@ -4,9 +4,6 @@
 
 #include "rolling_template.h"
 
-// #define __COUGAR_NO_VERIFY__
-
-// #define __COUGAR_NO_VERIFY__ // TODO: add this to cougar.h -> control there is no need to verify
 // #define __COUGAR_COUNTER__ // TODO: add this to cougar.h -> control whether to use a counter or not
 
 #ifdef SourceType
