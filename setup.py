@@ -17,7 +17,7 @@ setup(
     requires=["numpy"],
     install_requires=["numpy"],
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Science/Research",
         "Natural Language :: English",
         "Operating System :: Microsoft :: Windows",
@@ -33,8 +33,8 @@ setup(
     ext_modules=[
         Extension(
             "cougar.rolling",
-            ["cougar/rolling.c"],
-            include_dirs=["cougar", np.get_include()],
+            ["cougar/cext/rolling.c"],
+            include_dirs=["cougar/cext", np.get_include()],
             extra_compile_args=["-O2"],
         )
     ],

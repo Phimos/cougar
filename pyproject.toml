@@ -8,7 +8,7 @@ maintainers = ["Yunchong Gan <yunchong@pku.edu.cn>"]
 readme = "README.md"
 repository = "https://github.com/Phimos/cougar"
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Natural Language :: English",
     "Operating System :: POSIX :: Linux",
@@ -23,7 +23,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 numpy = "^1.21"
 
 
