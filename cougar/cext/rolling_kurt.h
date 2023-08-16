@@ -9,10 +9,10 @@
 
 #define Method kurt
 
-#define Rolling_Signature(name, dtype)                                           \
-    static void Rolling_Concat(rolling_##name, dtype)(PyArrayObject * source,    \
-                                                      PyArrayObject * target,    \
-                                                      int window, int min_count, \
+#define Rolling_Signature(name, dtype)                                                 \
+    static void Rolling_Concat(rolling_##name, dtype)(PyArrayObject * source,          \
+                                                      PyArrayObject * target,          \
+                                                      size_t window, size_t min_count, \
                                                       int axis, int ddof)
 
 #define Rolling_Init()                        \

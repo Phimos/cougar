@@ -21,10 +21,11 @@
 
 #ifndef Rolling_Signature
 #define __ROLLING_SIGNATURE__
-#define Rolling_Signature(name, dtype)                                        \
-    static void Rolling_Concat(rolling_##name, dtype)(PyArrayObject * source, \
-                                                      PyArrayObject * target, \
-                                                      int window, int min_count, int axis)
+#define Rolling_Signature(name, dtype)                                                 \
+    static void Rolling_Concat(rolling_##name, dtype)(PyArrayObject * source,          \
+                                                      PyArrayObject * target,          \
+                                                      size_t window, size_t min_count, \
+                                                      int axis)
 #endif  // Rolling_Signature
 
 #ifndef Rolling_Init
