@@ -13,17 +13,20 @@
     size_t count = 0;  \
     TargetType sum = 0;
 
-#define Rolling_Insert(value) \
-    sum += value;             \
-    ++count;
-
-#define Rolling_Evict(value) \
-    sum -= value;            \
-    --count;
-
 #define Rolling_Reset() \
     count = 0;          \
     sum = 0;
+
+#define Rolling_Insert(value) \
+    ++count;                  \
+    sum += value;
+
+#define Rolling_Evict(value) \
+    --count;                 \
+    sum -= value;
+
+#define Rolling_InsertAndEvict(curr, prev) \
+    sum += curr - prev;
 
 #define Rolling_Compute() (sum)
 
@@ -37,7 +40,24 @@
 #include "rolling_impl.h"
 #undef SourceType
 
+#undef Rolling_Evict
+#undef Rolling_Insert
+#undef Rolling_Reset
+#undef Rolling_Init
+
 #define __COUGAR_NO_VERIFY__
+
+#define Rolling_Init() \
+    TargetType sum = 0;
+
+#define Rolling_Reset() \
+    sum = 0;
+
+#define Rolling_Insert(curr) \
+    sum += curr;
+
+#define Rolling_Evict(prev) \
+    sum -= prev;
 
 #define SourceType npy_int64
 #include "rolling_impl.h"
@@ -59,6 +79,7 @@
 #undef Rolling_Reset
 #undef Rolling_Insert
 #undef Rolling_Evict
+#undef Rolling_InsertAndEvict
 
 #undef Method
 

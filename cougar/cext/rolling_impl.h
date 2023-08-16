@@ -71,6 +71,14 @@
 
 #ifdef Rolling_Insert
 #ifdef Rolling_Evict
+
+#ifndef Rolling_InsertAndEvict
+#define __ROLLING_INSERT_AND_EVICT__
+#define Rolling_InsertAndEvict(curr, prev) \
+    Rolling_Insert(curr);                  \
+    Rolling_Evict(prev);
+#endif  // Rolling_InsertAndEvict
+
 #ifdef Rolling_Assign
 
 #ifndef Rolling_StepMinCount
@@ -95,15 +103,18 @@
 
 #ifndef Rolling_StepN
 #define __ROLLING_STEP_N__
-#define Rolling_StepN()                 \
-    Rolling_GetValue(curr, SourceType); \
-    Rolling_GetValue(prev, SourceType); \
-    if (Rolling_Valid(curr)) {          \
-        Rolling_Insert(curr);           \
-    }                                   \
-    if (Rolling_Valid(prev)) {          \
-        Rolling_Evict(prev);            \
-    }                                   \
+#define Rolling_StepN()                         \
+    Rolling_GetValue(curr, SourceType);         \
+    Rolling_GetValue(prev, SourceType);         \
+    if (Rolling_Valid(curr)) {                  \
+        if (Rolling_Valid(prev)) {              \
+            Rolling_InsertAndEvict(curr, prev); \
+        } else {                                \
+            Rolling_Insert(curr);               \
+        }                                       \
+    } else if (Rolling_Valid(prev)) {           \
+        Rolling_Evict(prev);                    \
+    }                                           \
     Rolling_AssignN();
 #endif  // Rolling_StepN
 
@@ -176,6 +187,11 @@ Rolling_Main(Method)
 #undef Rolling_Finalize
 #undef __ROLLING_FINALIZE__
 #endif  // __ROLLING_FINALIZE__
+
+#ifdef __ROLLING_INSERT_AND_EVICT__
+#undef Rolling_InsertAndEvict
+#undef __ROLLING_INSERT_AND_EVICT__
+#endif  // __ROLLING_INSERT_AND_EVICT__
 
 #ifdef __ROLLING_ASSIGN__
 #undef Rolling_Assign

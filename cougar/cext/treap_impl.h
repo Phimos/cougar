@@ -282,12 +282,6 @@ static inline void method(remove, T)(treap(T) * treap) {
         treap->head = method(step, T)(treap, treap->head);
     }
 
-    // if (node->count == 0) {
-    //     treap->root = method(remove_node, T)(method(find_node, T)(node));
-    // } else {
-    //     treap->root = method(remove_node, T)(node);
-    // }
-
     if (node->count == 0) {
         node = method(find_node, T)(node);
     }

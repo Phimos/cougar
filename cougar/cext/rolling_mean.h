@@ -14,12 +14,15 @@
     TargetType sum = 0;
 
 #define Rolling_Insert(value) \
-    sum += value;             \
-    ++count;
+    ++count;                  \
+    sum += value;
 
 #define Rolling_Evict(value) \
-    sum -= value;            \
-    --count;
+    --count;                 \
+    sum -= value;
+
+#define Rolling_InsertAndEvict(curr, prev) \
+    sum += curr - prev;
 
 #define Rolling_Reset() \
     count = 0;          \
@@ -59,6 +62,7 @@
 #undef Rolling_Reset
 #undef Rolling_Insert
 #undef Rolling_Evict
+#undef Rolling_InsertAndEvict
 
 #undef Method
 
