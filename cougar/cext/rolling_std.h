@@ -33,6 +33,13 @@
     mean -= delta / count;   \
     m2 -= delta * (value - mean);
 
+#define Rolling_InsertAndEvict(curr, prev) \
+    delta = curr - prev;                   \
+    curr -= mean;                          \
+    mean += delta / count;                 \
+    prev -= mean;                          \
+    m2 += (curr + prev) * delta;
+
 #define Rolling_Compute() (npy_sqrt((m2 = m2 < 0 ? 0 : m2) / (count - ddof)))
 
 #define SourceType npy_float64
@@ -75,6 +82,7 @@
 #undef Rolling_Insert
 #undef Rolling_Evict
 #undef Rolling_Signature
+#undef Rolling_InsertAndEvict
 
 #undef Method
 
