@@ -204,7 +204,7 @@ static inline T method(query_kth, T)(treap(T) * treap, size_t k) {
     }
 }
 
-static inline T method(query_quantile, T)(treap(T) * treap, double quantile) {
+static inline double method(query_quantile, T)(treap(T) * treap, double quantile) {
     assert((quantile >= 0) && (quantile <= 1));
     double rank = quantile * (double)(treap->size - 1) + 1;
     size_t lower = (size_t)floor(rank);

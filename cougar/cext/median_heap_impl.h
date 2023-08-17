@@ -248,9 +248,9 @@ static inline void method(pop, T)(median_heap(T) * heap) {
     }
 }
 
-static inline T method(query_median, T)(median_heap(T) * heap) {
+static inline double method(query_median, T)(median_heap(T) * heap) {
     if (heap->min_size == heap->max_size) {
-        return (heap->min_heap[0]->value + heap->max_heap[0]->value) / 2;
+        return (heap->min_heap[0]->value + heap->max_heap[0]->value) * 0.5;
     } else {
         return heap->min_heap[0]->value;
     }
