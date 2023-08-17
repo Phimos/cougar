@@ -211,7 +211,7 @@ static inline double method(query_quantile, T)(treap(T) * treap, double quantile
     size_t upper = (size_t)ceil(rank);
 
     if (lower == upper) {
-        return method(query_kth, T)(treap, lower);
+        return (double)(method(query_kth, T)(treap, lower));
     } else {
         double lower_weight = (double)(upper)-rank;
         double upper_weight = rank - (double)(lower);
