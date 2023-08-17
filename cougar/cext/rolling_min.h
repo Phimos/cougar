@@ -30,7 +30,7 @@
         monotonic_queue_method(pop_front, SourceType)(queue);                   \
     }
 
-#define Rolling_Compute() (monotonic_queue_method(front_value, SourceType)(queue))
+#define Rolling_Compute() ((TargetType)(monotonic_queue_method(front_value, SourceType)(queue)))
 
 #define Rolling_Finalize() \
     monotonic_queue_method(free, SourceType)(queue);
