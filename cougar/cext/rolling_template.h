@@ -7,9 +7,9 @@
 #define Rolling_SetValue(name, value, dtype) *((dtype*)name##_ptr) = (value)
 
 #define Rolling_Prepare()                                                     \
-    const Py_ssize_t n = PyArray_SHAPE(source)[axis];                         \
-    const Py_ssize_t source_stride = PyArray_STRIDES(source)[axis];           \
-    const Py_ssize_t target_stride = PyArray_STRIDES(target)[axis];           \
+    const size_t n = PyArray_SHAPE(source)[axis];                             \
+    const size_t source_stride = PyArray_STRIDES(source)[axis];               \
+    const size_t target_stride = PyArray_STRIDES(target)[axis];               \
                                                                               \
     PyArrayIterObject* source_iter =                                          \
         (PyArrayIterObject*)PyArray_IterAllButAxis((PyObject*)source, &axis); \

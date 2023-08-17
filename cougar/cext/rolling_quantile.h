@@ -15,11 +15,11 @@
 
 #define Method quantile
 
-#define Rolling_Signature(name, dtype)                                        \
-    static void Rolling_Concat(rolling_##name, dtype)(PyArrayObject * source, \
-                                                      PyArrayObject * target, \
-                                                      int window, double q,   \
-                                                      int min_count, int axis)
+#define Rolling_Signature(name, dtype)                                         \
+    static void Rolling_Concat(rolling_##name, dtype)(PyArrayObject * source,  \
+                                                      PyArrayObject * target,  \
+                                                      size_t window, double q, \
+                                                      size_t min_count, int axis)
 
 #define Rolling_Init()         \
     size_t count = 0;          \
