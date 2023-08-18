@@ -13,27 +13,39 @@
                                                       size_t window, size_t min_count, \
                                                       int axis, int ddof)
 
-#define Rolling_Init() \
-    size_t count = 0;  \
-    TargetType delta, mean, m2;
+#define Rolling_Init()          \
+    size_t count = 0;           \
+    TargetType delta, mean, m2; \
+    TargetType icount, icount_ddof;
 
 #define Rolling_Reset() \
     count = 0;          \
     mean = m2 = 0;
 
-#define Rolling_Insert(value) \
-    ++count;                  \
-    delta = value - mean;     \
-    mean += delta / count;    \
+#define Rolling_Insert(value)                       \
+    ++count;                                        \
+    icount = 1.0 / (TargetType)(count);             \
+    icount_ddof = 1.0 / (TargetType)(count - ddof); \
+    delta = value - mean;                           \
+    mean += delta * icount;                         \
     m2 += delta * (value - mean);
 
-#define Rolling_Evict(value) \
-    --count;                 \
-    delta = value - mean;    \
-    mean -= delta / count;   \
+#define Rolling_Evict(value)                        \
+    --count;                                        \
+    icount = 1.0 / (TargetType)(count);             \
+    icount_ddof = 1.0 / (TargetType)(count - ddof); \
+    delta = value - mean;                           \
+    mean -= delta * icount;                         \
     m2 -= delta * (value - mean);
 
-#define Rolling_Compute() ((count >= min_count) ? ((m2 = m2 < 0 ? 0 : m2) / (count - ddof)) : NPY_NAN)
+#define Rolling_InsertAndEvict(curr, prev) \
+    delta = curr - prev;                   \
+    curr -= mean;                          \
+    mean += delta * icount;                \
+    prev -= mean;                          \
+    m2 += (curr + prev) * delta;
+
+#define Rolling_Compute() ((m2 = m2 < 0 ? 0 : m2) * icount_ddof)
 
 #define SourceType npy_float64
 #define TargetType npy_float64
@@ -75,6 +87,7 @@
 #undef Rolling_Insert
 #undef Rolling_Evict
 #undef Rolling_Signature
+#undef Rolling_InsertAndEvict
 
 #undef Method
 
