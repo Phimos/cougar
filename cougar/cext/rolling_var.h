@@ -39,11 +39,9 @@
     m2 -= delta * (value - mean);
 
 #define Rolling_InsertAndEvict(curr, prev) \
-    delta = curr - prev;                   \
-    curr -= mean;                          \
+    delta = (TargetType)(curr - prev);     \
     mean += delta * icount;                \
-    prev -= mean;                          \
-    m2 += (curr + prev) * delta;
+    m2 += (curr + prev - mean - mean + delta * icount) * delta;
 
 #define Rolling_Compute() ((m2 = m2 < 0 ? 0 : m2) * icount_ddof)
 
