@@ -10,15 +10,17 @@
 #define Method mean
 
 #define Rolling_Init() \
-    size_t count = 0;  \
-    TargetType sum = 0;
+    size_t count;      \
+    TargetType sum, icount;
 
 #define Rolling_Insert(value) \
     ++count;                  \
+    icount = 1.0 / count;     \
     sum += value;
 
 #define Rolling_Evict(value) \
     --count;                 \
+    icount = 1.0 / count;    \
     sum -= value;
 
 #define Rolling_InsertAndEvict(curr, prev) \
@@ -28,7 +30,7 @@
     count = 0;          \
     sum = 0;
 
-#define Rolling_Compute() (sum / count)
+#define Rolling_Compute() (sum * icount)
 
 #define TargetType npy_float64
 
