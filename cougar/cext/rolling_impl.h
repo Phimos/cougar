@@ -4,8 +4,6 @@
 
 #include "rolling_template.h"
 
-// #define __COUGAR_COUNTER__ // TODO: add this to cougar.h -> control whether to use a counter or not
-
 #ifdef SourceType
 #ifdef TargetType
 #ifdef Method
