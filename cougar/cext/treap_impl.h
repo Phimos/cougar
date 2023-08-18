@@ -151,6 +151,8 @@ static inline treap_node(T) * method(insert_node, T)(treap_node(T) * current, tr
 
         current->count = 0;
         current->parent = node;
+        current->children[0] = current->children[1] = NULL;
+        current = node;
     }
 
     method(update, T)(current);
